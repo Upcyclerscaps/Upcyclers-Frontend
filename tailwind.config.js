@@ -18,6 +18,9 @@ module.exports = {
           900: '#14532d',
         },
       },
+      screens: {
+        'custom-md': '770px',
+      },
     },
   },
   plugins: [],
