@@ -20,4 +20,8 @@ window.addEventListener('hashchange', () => {
 
 window.addEventListener('load', () => {
   app.renderPage();
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> origin/main
