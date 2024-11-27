@@ -37,7 +37,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src/public/'),
+          from: path.resolve(__dirname, 'forntend/src/public/'),
           to: path.resolve(__dirname, 'dist/'),
         },
       ],
