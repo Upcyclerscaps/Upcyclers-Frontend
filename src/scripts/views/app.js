@@ -4,56 +4,20 @@ import routes from '../routes/routes';
 import AuthService from '../services/auth.service';
 
 class App {
-  constructor({ content, menu, drawer }) {
+  constructor({ content }) {
     this._content = content;
-    this._menu = menu;
-    this._drawer = drawer;
     this._header = document.querySelector('header');
 
     this._initialAppShell();
   }
 
   _initialAppShell() {
-    // Initialize drawer
-    this._drawer.addEventListener('click', (event) => {
-      this._toggleDrawer(event);
-    });
-
-    // Close drawer when clicking outside
-    document.addEventListener('click', (event) => {
-      if (!this._drawer.contains(event.target) && !this._menu.contains(event.target)) {
-        this._menu.classList.add('hidden');
-      }
-    });
-
     // Handle scroll for header
     window.addEventListener('scroll', () => {
       if (window.scrollY > 50) {
-        this._header.classList.add('bg-white', 'shadow-md');
+        this._header?.classList.add('bg-white', 'shadow-md');
       } else {
-        this._header.classList.remove('bg-white', 'shadow-md');
-      }
-    });
-
-    // Update active menu item
-    this._updateActiveMenuItem();
-  }
-
-  _toggleDrawer(event) {
-    event.stopPropagation();
-    this._menu.classList.toggle('hidden');
-  }
-
-  _updateActiveMenuItem() {
-    const url = UrlParser.parseActiveUrlWithCombiner();
-    const menuItems = document.querySelectorAll('.nav-item');
-
-    menuItems.forEach((item) => {
-      const itemUrl = item.getAttribute('href').slice(1); // Remove #
-      if (itemUrl === url) {
-        item.classList.add('text-primary-600', 'font-bold');
-      } else {
-        item.classList.remove('text-primary-600', 'font-bold');
+        this._header?.classList.remove('bg-white', 'shadow-md');
       }
     });
   }
@@ -100,9 +64,6 @@ class App {
       if (page.afterRender) {
         await page.afterRender();
       }
-
-      // Update active menu item
-      this._updateActiveMenuItem();
 
       // Scroll to top smoothly
       window.scrollTo({ top: 0, behavior: 'smooth' });
