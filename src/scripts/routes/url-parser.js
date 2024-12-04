@@ -12,19 +12,23 @@ const UrlParser = {
   },
 
   _urlSplitter(url) {
-    // Split URL and query parameters
-    const [resource, queryString] = url.split('?');
-    const params = new URLSearchParams(queryString || '');
-
+    const [resource, id] = url.split('?');
     return {
-      resource: resource.split('/')[1] || null,
-      id: params.get('id') || null,
+      resource: resource || '/',
+      id: this._parseId(id),
     };
   },
 
+  _parseId(queryString) {
+    if (!queryString) return null;
+
+    const params = new URLSearchParams(queryString);
+    return params.get('id');
+  },
+
   _urlCombiner(splitedUrl) {
-    return splitedUrl.resource ? `/${splitedUrl.resource}` : '/';
-  }
+    return splitedUrl.resource;
+  },
 };
 
 export default UrlParser;

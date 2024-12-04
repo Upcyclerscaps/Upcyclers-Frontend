@@ -6,9 +6,6 @@ const CONFIG = {
     DATABASE_NAME: 'upcyclers-database',
     DATABASE_VERSION: 1,
     OBJECT_STORE_NAME: 'items',
-    // API keys and environment variables
-    // GOOGLE_MAPS_KEY: 'YOUR_GOOGLE_MAPS_API_KEY',
-    // etc.
   };
   
   export default CONFIG;

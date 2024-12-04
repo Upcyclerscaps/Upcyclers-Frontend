@@ -50,19 +50,19 @@ const AboutPage = {
 
   _teamMembers: [
     {
-      name: 'Ahmad Ridwan',
+      name: 'Zaidan Rivandani',
       role: 'CEO & Founder',
       description: 'Berpengalaman 10 tahun dalam industri daur ulang dan teknologi.',
       image: 'https://storage.googleapis.com/a1aa/image/QxAxVq5Q7K4GNhIQtBZWiq2aFzNugRR1DlXB7BhauaoDwA9E.jpg'
     },
     {
-      name: 'Sarah Wijaya',
+      name: 'Zaidan Rivandani',
       role: 'CTO',
       description: 'Ahli teknologi dengan fokus pada pengembangan platform berkelanjutan.',
       image: 'https://storage.googleapis.com/a1aa/image/B6i22Co7GhbeJaUDIov4W6GEfIR40D2lsAJespCzB2qeAMQPB.jpg'
     },
     {
-      name: 'Budi Santoso',
+      name: 'Zaidan Rivandani',
       role: 'COO',
       description: 'Spesialis operasional dengan pengalaman di manajemen rantai pasok.',
       image: 'https://storage.googleapis.com/a1aa/image/jlieyFhcV1UMUq6bMKGTzMNM6kppf7lrSjrfQebbzgV1AMQPB.jpg'

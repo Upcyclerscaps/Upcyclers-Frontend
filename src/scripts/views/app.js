@@ -1,6 +1,7 @@
 /* eslint-disable linebreak-style */
 import UrlParser from '../routes/url-parser';
 import routes from '../routes/routes';
+import AuthService from '../services/auth.service';
 
 class App {
   constructor({ content, menu, drawer }) {
@@ -60,15 +61,22 @@ class App {
   async renderPage() {
     try {
       const url = UrlParser.parseActiveUrlWithCombiner();
-      const page = routes[url] || routes['/404'];
 
-      // Update page title
-      document.title = this._getPageTitle(url);
+      // Protected routes check
+      const protectedRoutes = ['/jual-beli', '/find-collector'];
+      if (protectedRoutes.includes(url) && !AuthService.isAuthenticated()) {
+        window.location.hash = '#/auth';
+        return;
+      }
 
       // Show loading state
       this._content.innerHTML = this._getLoadingIndicator();
 
       let content = '';
+      const page = routes[url] || routes['/404'];
+
+      // Update page title
+      document.title = this._getPageTitle(url);
 
       // Handle product detail page
       if (url === '/product') {
@@ -122,13 +130,13 @@ class App {
 
   _getLoadingIndicator() {
     return `
-      <div class="min-h-screen flex items-center justify-center">
-        <div class="text-center">
-          <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p class="text-gray-600">Memuat...</p>
-        </div>
-      </div>
-    `;
+     <div class="min-h-screen flex items-center justify-center">
+       <div class="text-center">
+         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600 mx-auto mb-4"></div>
+         <p class="text-gray-600">Memuat...</p>
+       </div>
+     </div>
+   `;
   }
 }
 
