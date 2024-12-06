@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+// src/scripts/views/pages/auth-page.js
 import API_ENDPOINT from '../../globals/api-endpoint';
 
 const Auth = {

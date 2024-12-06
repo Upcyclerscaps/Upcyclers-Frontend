@@ -30,6 +30,7 @@ const EditProfile = {
                       <input type="file" class="hidden" accept="image/*" id="profileImageInput" name="profileImage"/>
                     </label>
                   </div>
+                  <input type="hidden" id="profileImageUrl" name="profileImage">
                   <p class="text-sm text-gray-600">Klik ikon kamera untuk mengganti foto profil</p>
                 </div>
    
@@ -164,21 +165,43 @@ const EditProfile = {
   _initializeImageUpload() {
     const input = document.getElementById('profileImageInput');
     const preview = document.getElementById('previewImage');
+    const hiddenInput = document.getElementById('profileImageUrl');
 
-    input?.addEventListener('change', (e) => {
+    input?.addEventListener('change', async (e) => {
       const file = e.target.files[0];
-      if (file) {
-        if (file.size > 2 * 1024 * 1024) {
-          alert('Ukuran file maksimal 2MB');
-          input.value = '';
-          return;
-        }
+      if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          preview.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran file maksimal 2MB');
+        input.value = '';
+        return;
+      }
+
+      try {
+        preview.src = 'https://via.placeholder.com/128?text=Loading...';
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch(API_ENDPOINT.UPLOAD_IMAGE, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+
+        const data = await response.json();
+
+        preview.src = data.data.url;
+        hiddenInput.value = data.data.url; // Update hidden input with cloudinary URL
+
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Gagal mengupload gambar. Silakan coba lagi.');
+        preview.src = this._getUserData()?.profileImage || 'https://via.placeholder.com/128';
       }
     });
   },
@@ -264,91 +287,70 @@ const EditProfile = {
 
   _initializeForm() {
     const form = document.getElementById('profileForm');
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await this._handleSubmit(e);
+      });
+    }
+  },
 
-    form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try {
-        const formData = new FormData(form);
-        const token = localStorage.getItem('token');
+  async _handleSubmit(event) {
+    event.preventDefault();
+    try {
+      const formData = new FormData(event.target);
 
-        // Gabungkan nama depan dan belakang
-        const fullName = `${formData.get('firstName')} ${formData.get('lastName')}`.trim();
+      const firstName = formData.get('firstName') || '';
+      const lastName = formData.get('lastName') || '';
+      const fullName = `${firstName} ${lastName}`.trim();
 
-        // Buat object data untuk dikirim
-        const updateData = {
-          name: fullName,
-          phone: formData.get('phone'),
-          address: formData.get('address'),
-          city: formData.get('city'),
-          postalCode: formData.get('postalCode'),
-          latitude: formData.get('latitude'),
-          longitude: formData.get('longitude')
-        };
+      // Ambil profileImage dari hidden input
+      const profileImageUrl = document.getElementById('profileImageUrl').value;
 
-        // Handle password update if provided
-        if (formData.get('currentPassword')) {
-          if (!formData.get('newPassword')) {
-            throw new Error('Password baru harus diisi');
-          }
-          if (formData.get('newPassword') !== formData.get('confirmPassword')) {
-            throw new Error('Password baru dan konfirmasi tidak cocok');
-          }
-          updateData.currentPassword = formData.get('currentPassword');
-          updateData.newPassword = formData.get('newPassword');
-        }
+      const updateData = {
+        name: fullName,
+        phone: formData.get('phone') || '',
+        address: formData.get('address') || '',
+        city: formData.get('city') || '',
+        postalCode: formData.get('postalCode') || ''
+      };
 
-        const response = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updateData)
-        });
-
-        const responseJson = await response.json();
-
-        if (!response.ok) {
-          throw new Error(responseJson.message || 'Gagal mengupdate profil');
-        }
-
-        // Handle image upload if provided
-        const profileImage = formData.get('profileImage');
-        if (profileImage && profileImage.size > 0) {
-          const imageFormData = new FormData();
-          imageFormData.append('profileImage', profileImage);
-
-          const imageResponse = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: imageFormData
-          });
-
-          if (!imageResponse.ok) {
-            throw new Error('Gagal mengupload foto profil');
-          }
-        }
-
-        // Update localStorage
-        const currentUser = JSON.parse(localStorage.getItem('user'));
-        const updatedUser = {
-          ...currentUser,
-          ...updateData,
-          profileImage: responseJson.data?.user?.profileImage || currentUser.profileImage
-        };
-
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-
-        alert('Profil berhasil diperbarui');
-        window.location.hash = '#/profile';
-
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        alert(error.message || 'Gagal mengupdate profil');
+      // Hanya tambahkan profileImage jika ada URL valid
+      if (profileImageUrl && profileImageUrl !== '') {
+        updateData.profileImage = profileImageUrl;
       }
-    });
+
+      // Filter out empty values
+      Object.keys(updateData).forEach((key) =>
+        !updateData[key] && delete updateData[key]
+      );
+
+      console.log('Sending update data:', updateData);
+
+      const response = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+
+      alert('Profil berhasil diperbarui');
+      window.location.hash = '#/profile';
+
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert(error.message || 'Gagal memperbarui profil');
+    }
   }
 };
 
