@@ -17,6 +17,12 @@ const API_ENDPOINT = {
   DELETE_PRODUCT: (id) => `${CONFIG.BASE_URL}/products/${id}`,
   USER_PRODUCTS: `${CONFIG.BASE_URL}/products/user`,
 
+  //BUY OFFERS
+  ADD_BUY_ITEM: `${CONFIG.BASE_URL}/users/buy-items`,
+  BUY_OFFERS: `${CONFIG.BASE_URL}/buy-offers`,
+  BUY_OFFER_DETAIL: (id) => `${CONFIG.BASE_URL}/buy-offers/${id}`,
+  USER_BUY_OFFERS: `${CONFIG.BASE_URL}/buy-offers/user`,
+
   // Upload endpoint
   UPLOAD_IMAGE: `${CONFIG.BASE_URL}/uploads`,
 

@@ -298,14 +298,34 @@ const EditProfile = {
   async _handleSubmit(event) {
     event.preventDefault();
     try {
-      const formData = new FormData(event.target);
+      // Upload image jika ada
+      const imageFile = document.querySelector('#profileImageInput').files[0];
+      let profileImageUrl = '';
 
+      if (imageFile) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', imageFile);
+
+        const uploadResponse = await fetch(API_ENDPOINT.UPLOAD_IMAGE, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: imageFormData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Gagal mengupload foto profil');
+        }
+
+        const uploadResult = await uploadResponse.json();
+        profileImageUrl = uploadResult.data.url;
+      }
+
+      const formData = new FormData(event.target);
       const firstName = formData.get('firstName') || '';
       const lastName = formData.get('lastName') || '';
       const fullName = `${firstName} ${lastName}`.trim();
-
-      // Ambil profileImage dari hidden input
-      const profileImageUrl = document.getElementById('profileImageUrl').value;
 
       const updateData = {
         name: fullName,
@@ -315,17 +335,12 @@ const EditProfile = {
         postalCode: formData.get('postalCode') || ''
       };
 
-      // Hanya tambahkan profileImage jika ada URL valid
-      if (profileImageUrl && profileImageUrl !== '') {
+      // Hanya tambahkan profileImage jika berhasil upload
+      if (profileImageUrl) {
         updateData.profileImage = profileImageUrl;
       }
 
-      // Filter out empty values
-      Object.keys(updateData).forEach((key) =>
-        !updateData[key] && delete updateData[key]
-      );
-
-      console.log('Sending update data:', updateData);
+      console.log('Sending update data:', updateData); // Debug log
 
       const response = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
         method: 'PATCH',
@@ -342,8 +357,13 @@ const EditProfile = {
       }
 
       const data = await response.json();
-      localStorage.setItem('user', JSON.stringify(data.data.user));
 
+      // Verify if update was successful
+      if (!data.data.user.profileImage && profileImageUrl) {
+        throw new Error('Gagal memperbarui foto profil');
+      }
+
+      localStorage.setItem('user', JSON.stringify(data.data.user));
       alert('Profil berhasil diperbarui');
       window.location.hash = '#/profile';
 

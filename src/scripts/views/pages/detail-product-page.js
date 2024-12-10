@@ -5,6 +5,11 @@ import API_ENDPOINT from '../../globals/api-endpoint';
 
 const DetailProductPage = {
   async render(productId) {
+    if (!localStorage.getItem('token')) {
+      window.location.hash = '#/auth';
+      return '';
+    }
+
     return `
       <section class="pt-24 pb-12">
         <div class="container mx-auto px-4">
@@ -25,7 +30,6 @@ const DetailProductPage = {
 
   async afterRender() {
     try {
-      // Get product ID from URL
       const url = window.location.hash;
       const id = url.split('?id=')[1];
 
@@ -33,10 +37,11 @@ const DetailProductPage = {
         throw new Error('Product ID not found');
       }
 
-      // Fetch product data
+      // Add auth header
       const response = await fetch(`${API_ENDPOINT.GET_PRODUCT_DETAIL(id)}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
         }
       });
 

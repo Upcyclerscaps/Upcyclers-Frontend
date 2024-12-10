@@ -1,22 +1,37 @@
 /* eslint-disable linebreak-style */
+
 import API_ENDPOINT from '../globals/api-endpoint';
 
 const ProductService = {
   async getAllProducts() {
     try {
-      const response = await fetch(API_ENDPOINT.GET_PRODUCTS);
-      const responseJson = await response.json();
+      const token = localStorage.getItem('token');
 
-      console.log('Raw product data:', responseJson);
+      const response = await fetch(API_ENDPOINT.GET_PRODUCTS, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
       if (!response.ok) {
-        throw new Error(responseJson.message);
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch products');
       }
 
-      return responseJson;
+      const responseJson = await response.json();
+      return {
+        status: 'success',
+        data: responseJson.data || []
+      };
+
     } catch (error) {
       console.error('Error getting products:', error);
-      throw error;
+      return {
+        status: 'error',
+        data: []
+      };
     }
   },
 
@@ -31,13 +46,13 @@ const ProductService = {
         body: JSON.stringify(productData)
       });
 
-      const responseJson = await response.json();
-
       if (!response.ok) {
-        throw new Error(responseJson.message || 'Failed to create product');
+        throw new Error('Failed to create product');
       }
 
-      return responseJson.data;
+      const data = await response.json();
+      return data.data;
+
     } catch (error) {
       console.error('Error creating product:', error);
       throw error;
@@ -62,7 +77,8 @@ const ProductService = {
       }
 
       const data = await response.json();
-      return data.url;
+      return data.data.url;
+
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;

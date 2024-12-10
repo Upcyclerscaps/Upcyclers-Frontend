@@ -34,27 +34,8 @@ const StepsHandler = {
       nextButton.disabled = true;
       nextButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
 
-      // Ambil formData di awal
-      const formData = new FormData(form);
-
-      // Debug: cek data user dari localStorage
+      // Ambil data user dari localStorage
       const user = JSON.parse(localStorage.getItem('user'));
-      console.log('User data:', user);
-
-      // Ambil data koordinat dari form atau user
-      let coordinates = [0, 0]; // Default koordinat
-
-      if (formData.get('latitude') && formData.get('longitude')) {
-        coordinates = [
-          parseFloat(formData.get('longitude')),
-          parseFloat(formData.get('latitude'))
-        ];
-      } else if (user?.latitude && user?.longitude) {
-        coordinates = [
-          parseFloat(user.longitude),
-          parseFloat(user.latitude)
-        ];
-      }
 
       // Upload image ke Cloudinary
       const imageFile = document.querySelector('#mainImageInput').files[0];
@@ -78,7 +59,16 @@ const StepsHandler = {
       const uploadResult = await uploadResponse.json();
       imageUrl = uploadResult.data.url;
 
-      // Siapkan data produk
+      // Get coordinates from form or user data
+      const formData = new FormData(form);
+      const latitude = document.getElementById('latitude').value || user?.latitude;
+      const longitude = document.getElementById('longitude').value || user?.longitude;
+
+      if (!latitude || !longitude) {
+        throw new Error('Lokasi belum dipilih. Silakan pilih lokasi di peta.');
+      }
+
+      // Prepare product data
       const productData = {
         name: formData.get('nama_barang'),
         category: formData.get('kategori'),
@@ -93,8 +83,11 @@ const StepsHandler = {
         },
         location: {
           type: 'Point',
-          coordinates: coordinates,
-          address: user?.address || formData.get('alamat')
+          coordinates: [
+            parseFloat(longitude),
+            parseFloat(latitude)
+          ],
+          address: formData.get('alamat')
         },
         images: [{
           url: imageUrl,
@@ -102,9 +95,9 @@ const StepsHandler = {
         }]
       };
 
-      console.log('Product data to be sent:', productData);
+      console.log('Data to be sent:', productData); // Debug log
 
-      // Kirim data produk ke server
+      // Send to server
       const response = await fetch(API_ENDPOINT.CREATE_PRODUCT, {
         method: 'POST',
         headers: {

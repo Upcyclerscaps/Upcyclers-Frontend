@@ -26,8 +26,14 @@ class App {
     try {
       const url = UrlParser.parseActiveUrlWithCombiner();
 
+      // Check if trying to access auth page while logged in
+      if (url === '/auth' && AuthService.isAuthenticated()) {
+        window.location.hash = '#/';
+        return;
+      }
+
       // Protected routes check
-      const protectedRoutes = ['/jual-beli', '/find-collector'];
+      const protectedRoutes = ['/jual-beli', '/find-collector', '/product', '/buy-offers'];
       if (protectedRoutes.includes(url) && !AuthService.isAuthenticated()) {
         window.location.hash = '#/auth';
         return;
@@ -36,10 +42,7 @@ class App {
       // Show loading state
       this._content.innerHTML = this._getLoadingIndicator();
 
-      let content = '';
       const page = routes[url] || routes['/404'];
-
-      // Update page title
       document.title = this._getPageTitle(url);
 
       // Handle product detail page
@@ -48,17 +51,13 @@ class App {
         const productId = urlParams.id;
 
         if (!productId) {
-          content = await routes['/404'].render();
+          this._content.innerHTML = await routes['/404'].render();
         } else {
-          content = await page.render(productId);
+          this._content.innerHTML = await page.render(productId);
         }
       } else {
-        content = await page.render();
+        this._content.innerHTML = await page.render();
       }
-
-      // Render content with fade-in effect
-      this._content.innerHTML = content;
-      this._content.classList.add('fade-in');
 
       // Execute afterRender if exists
       if (page.afterRender) {
@@ -70,8 +69,7 @@ class App {
 
     } catch (error) {
       console.error('Error rendering page:', error);
-      const errorContent = await routes['/404'].render();
-      this._content.innerHTML = errorContent;
+      this._content.innerHTML = await routes['/404'].render();
     }
   }
 

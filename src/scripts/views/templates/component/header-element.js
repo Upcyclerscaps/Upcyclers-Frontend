@@ -23,6 +23,9 @@ class CustomHeader extends HTMLElement {
                 <a href="#/find-collector" class="hover:text-primary-200 transition-all">
                   <i class="fas fa-map-marker-alt mr-1"></i>Temukan Pengepul
                 </a>
+                <a href="#/buy-offers" class="hover:text-primary-200 transition-all">
+                  <i class="fas fa-list-alt mr-1"></i>Penawaran Beli
+                </a>
               ` : ''}
               <a href="#/about" class="hover:text-primary-200 transition-all">Tentang Kami</a>
             </nav>

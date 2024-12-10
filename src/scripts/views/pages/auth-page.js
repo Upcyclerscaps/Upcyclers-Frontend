@@ -4,6 +4,12 @@ import API_ENDPOINT from '../../globals/api-endpoint';
 
 const Auth = {
   async render() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.hash = '#/';
+      return '';
+    }
+
     return `
      <div class="pt-24 min-h-screen bg-gradient-to-br from-primary-500 to-primary-700">
        <div class="container mx-auto px-4 py-8">
