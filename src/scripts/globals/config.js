@@ -6,6 +6,7 @@ const CONFIG = {
   DATABASE_NAME: 'upcyclers-database',
   DATABASE_VERSION: 1,
   OBJECT_STORE_NAME: 'items',
+  test
 };
 
 export default CONFIG;
