@@ -102,3 +102,85 @@ header.bg-white {
   position: absolute;
   border-radius: 50%;
 }
+
+
+.custom-marker {
+  position: relative;
+  width: 30px;
+  height: 42px;
+}
+
+.marker-pin {
+  width: 30px;
+  height: 42px;
+  border-radius: 50% 50% 50% 0;
+  background: #16a34a;  /* primary-600 */
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 0;
+  top: 0;
+}
+
+.marker-pin::after {
+  content: '';
+  width: 24px;
+  height: 24px;
+  margin: 3px 0 0 3px;
+  background: white;
+  position: absolute;
+  border-radius: 50%;
+}
+
+.marker-icon {
+  position: absolute;
+  font-size: 16px;
+  width: 22px;
+  height: 22px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #16a34a;  /* primary-600 */
+  z-index: 1;
+}
+
+
+/* Memastikan footer selalu mengisi ruang yang tersedia */
+footer {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Mengatasi gap di mobile dan tablet */
+@media screen and (max-width: 768px) {
+  footer {
+    margin-bottom: 0;
+  }
+}
+
+
+/* Bottom Navigation Styles */
+@media (max-width: 768px) {
+  /* Add padding to main content to account for bottom nav */
+  main {
+    padding-bottom: 4rem;
+  }
+
+  /* Active state for bottom nav items */
+  .bottom-nav-active {
+    color: #16a34a; /* primary-600 */
+  }
+}
+
+/* Make icons consistent size */
+.bottom-nav-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Smooth transitions */
+.hover\:text-primary-600 {
+  transition: color 0.2s ease;
+}

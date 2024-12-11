@@ -132,26 +132,25 @@ const SearchHandler = {
       }
 
       // Get search results
-      const results = await this._fetchResults(searchType, formData);
+      const response = await this._fetchResults(searchType, formData);
+      console.log('Raw response:', response);
 
       // Format results properly
-      const formattedResults = {
-        sellers: [],
-        buyers: [],
-        coordinates: results.coordinates,
-        radius: formData.radius || 5 // Tambahkan radius
+      const displayData = {
+        sellers: searchType === 'seller' ? response.data : [],
+        buyers: searchType === 'collector' ? response.data : [],
+        coordinates: [
+          parseFloat(formData.location.split(',')[1]),
+          parseFloat(formData.location.split(',')[0])
+        ]
       };
 
-      if (searchType === 'seller') {
-        formattedResults.sellers = results.data || [];
-      } else {
-        formattedResults.buyers = results.data || [];
-      }
+      console.log('Formatted display data:', displayData);
 
       // Update UI dan map
-      this.resultsHandler.displayResults(formattedResults);
+      this.resultsHandler.displayResults(displayData);
       if (this.mapHandler) {
-        this.mapHandler.updateMarkers(formattedResults);
+        this.mapHandler.updateMarkers(displayData);
       }
 
     } catch (error) {
@@ -179,46 +178,36 @@ const SearchHandler = {
   },
 
   async _fetchResults(searchType, formData) {
-    const [lat, lng] = formData.location.split(',').map((coord) => parseFloat(coord.trim()));
-
     try {
+      const [lat, lng] = formData.location.split(',').map((coord) => parseFloat(coord.trim()));
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Silakan login terlebih dahulu');
-      }
 
       const params = new URLSearchParams({
         longitude: lng,
         latitude: lat,
         category: formData.category || '',
-        radius: formData.radius || 5
+        radius: formData.radius || 5,
+        _t: Date.now()
       });
 
-      let endpoint;
-      if (searchType === 'collector') {
-        endpoint = API_ENDPOINT.BUY_OFFERS; // Endpoint untuk penawaran beli
-      } else {
-        endpoint = API_ENDPOINT.GET_PRODUCTS; // Endpoint untuk produk
-      }
+      const endpoint = searchType === 'seller' ? API_ENDPOINT.GET_PRODUCTS : API_ENDPOINT.BUY_OFFERS;
+      const url = `${endpoint}?${params}`;
 
-      const response = await fetch(`${endpoint}?${params}`, {
+      console.log('Fetching from:', url);
+
+      const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache'
         }
       });
 
-      if (!response.ok) {
-        throw new Error('Gagal mencari data');
-      }
+      const data = await response.json();
+      console.log('Response data:', data);
 
-      const responseData = await response.json();
-
-      return {
-        data: responseData.data || [],
-        coordinates: [lng, lat]
-      };
+      return data; // Return langsung response dari server
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error('Search error:', error);
       throw error;
     }
   }

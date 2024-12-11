@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+/* eslint-disable no-unused-vars */
 
 import L from 'leaflet';
 
@@ -26,20 +27,15 @@ const MapHandler = {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-
-          // Clear existing markers
-          this.clearMarkers();
-          if (this.radiusCircle) {
-            this.map.removeLayer(this.radiusCircle);
-          }
-
-          // Update map view
           this.map.setView([latitude, longitude], 15);
 
-          // Add user marker
-          const userMarker = this.createUserMarker([latitude, longitude]);
-          userMarker.addTo(this.map);
-          this.markers.push(userMarker);
+          // Create and add user marker
+          if (this.userMarker) {
+            this.map.removeLayer(this.userMarker);
+          }
+          this.userMarker = this.createUserMarker([latitude, longitude]);
+          this.userMarker.addTo(this.map);
+          this.markers.push(this.userMarker);
 
           resolve({ latitude, longitude });
         },
@@ -52,78 +48,46 @@ const MapHandler = {
   },
 
   createUserMarker(coordinates) {
-    return L.marker(coordinates, {
-      icon: L.divIcon({
-        html: '<i class="fas fa-user-circle fa-2x text-primary-600"></i>',
-        className: 'user-location-marker',
-        iconSize: [24, 24]
-      })
-    }).bindPopup('Lokasi Anda');
+    const userIcon = L.divIcon({
+      html: '<i class="fas fa-user-circle fa-2x text-primary-600"></i>',
+      className: 'user-marker-icon',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16]
+    });
+
+    this.userMarker = L.marker(coordinates, { icon: userIcon }).bindPopup('Lokasi Anda');
+    return this.userMarker;
   },
 
   updateMapLocation(locationString) {
     const [lat, lng] = locationString.split(',').map((coord) => parseFloat(coord.trim()));
-    if (!isNaN(lat) && !isNaN(lng)) {
-      // Clear existing markers and circle
-      this.clearMarkers();
-      if (this.radiusCircle) {
-        this.map.removeLayer(this.radiusCircle);
-      }
-
+    if (lat && lng) {
       // Update map view
       this.map.setView([lat, lng], 15);
 
-      // Add new marker
-      this.addMarker([lat, lng], 'Lokasi Anda', 'user');
+      // Update user marker
+      if (this.userMarker) {
+        this.map.removeLayer(this.userMarker);
+      }
+      this.userMarker = this.createUserMarker([lat, lng]);
+      this.userMarker.addTo(this.map);
 
-      // Trigger a map resize
-      setTimeout(() => {
-        this.map.invalidateSize();
-      }, 100);
+      // Add to markers array
+      this.markers = [this.userMarker];
     }
   },
 
   addMarker(coordinates, popupContent, type = 'default') {
     try {
-      // Validate coordinates
       if (!Array.isArray(coordinates) || coordinates.length !== 2 ||
           isNaN(coordinates[0]) || isNaN(coordinates[1])) {
         console.error('Invalid coordinates:', coordinates);
         return null;
       }
 
-      let icon;
-      switch (type) {
-      case 'user':
-        icon = L.divIcon({
-          html: '<i class="fas fa-user-circle fa-2x text-primary-600"></i>',
-          className: 'user-location-marker',
-          iconSize: [24, 24]
-        });
-        break;
-      case 'seller':
-        icon = L.divIcon({
-          html: '<i class="fas fa-store fa-2x text-red-600"></i>',
-          className: 'seller-location-marker',
-          iconSize: [24, 24]
-        });
-        break;
-      case 'buyer':
-        icon = L.divIcon({
-          html: '<i class="fas fa-shopping-cart fa-2x text-green-600"></i>',
-          className: 'buyer-location-marker',
-          iconSize: [24, 24]
-        });
-        break;
-      default:
-        icon = L.divIcon({
-          html: '<i class="fas fa-map-marker-alt fa-2x text-primary-600"></i>',
-          className: 'default-location-marker',
-          iconSize: [24, 24]
-        });
-      }
-
-      const marker = L.marker(coordinates, { icon })
+      // Gunakan marker default Leaflet untuk lokasi lain
+      const marker = L.marker(coordinates)
         .bindPopup(popupContent);
 
       marker.addTo(this.map);
@@ -139,6 +103,10 @@ const MapHandler = {
   updateMarkers(results) {
     try {
       this.clearMarkers();
+      // Jangan hapus user marker
+      if (this.userMarker) {
+        this.markers.push(this.userMarker);
+      }
 
       if (!results || (typeof results !== 'object')) {
         console.log('No valid results to display on map');
@@ -171,7 +139,7 @@ const MapHandler = {
         }
       });
 
-      // Update radius circle if coordinates exist
+      // Update radius circle dengan radius dari form
       if (results.coordinates && results.radius) {
         this.updateRadiusCircle(results.coordinates, results.radius);
       }
@@ -260,8 +228,18 @@ const MapHandler = {
   },
 
   clearMarkers() {
-    this.markers.forEach((marker) => marker.remove());
-    this.markers = [];
+    // Simpan user marker sebelum clear
+    const userMarker = this.markers.find((marker) =>
+      marker === this.userMarker
+    );
+
+    this.markers.forEach((marker) => {
+      if (marker !== this.userMarker) {
+        marker.remove();
+      }
+    });
+
+    this.markers = userMarker ? [userMarker] : [];
   },
 
   fitMapToMarkers() {

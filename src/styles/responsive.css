@@ -19,3 +19,55 @@
     gap: 1rem;
   }
 }
+
+
+/* Mobile first approach */
+@media screen and (max-width: 768px) {
+  /* Container padding */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Menu transitions */
+  #mobileMenu {
+    transition: all 0.3s ease;
+  }
+
+  /* Ensure menu is scrollable on small screens */
+  #mobileMenu.show {
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  /* Adjust spacing for tablet */
+  .md\:space-x-4 > * + * {
+    margin-left: 1rem;
+  }
+
+  /* Adjust text sizes */
+  .text-xl {
+    font-size: 1.25rem;
+  }
+}
+
+/* Desktop */
+@media screen and (min-width: 1024px) {
+  /* Container max width */
+  .container {
+    max-width: 1200px;
+  }
+
+  /* Larger spacing */
+  .lg\:space-x-6 > * + * {
+    margin-left: 1.5rem;
+  }
+}
+
+/* Hide scrollbar when mobile menu is open */
+body.menu-open {
+  overflow: hidden;
+}

@@ -12,12 +12,24 @@ class App {
   }
 
   _initialAppShell() {
-    // Handle scroll for header
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        this._header?.classList.add('bg-white', 'shadow-md');
+    // Add padding to content for mobile bottom nav
+    if (window.innerWidth < 768) {
+      this._content.style.paddingBottom = '4rem';
+    }
+
+    // Update active state in bottom nav
+    this._updateActiveNav();
+  }
+
+  _updateActiveNav() {
+    const currentHash = window.location.hash || '#/';
+    const bottomNavLinks = document.querySelectorAll('.bottom-nav a');
+
+    bottomNavLinks.forEach((link) => {
+      if (link.getAttribute('href') === currentHash) {
+        link.classList.add('text-primary-600');
       } else {
-        this._header?.classList.remove('bg-white', 'shadow-md');
+        link.classList.remove('text-primary-600');
       }
     });
   }
