@@ -2,7 +2,6 @@
 
 import L from 'leaflet';
 
-
 const MapHandler = {
   map: null,
   markers: [],
@@ -27,12 +26,20 @@ const MapHandler = {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          this.map.setView([latitude, longitude], 15);
+
+          // Clear existing markers
           this.clearMarkers();
+          if (this.radiusCircle) {
+            this.map.removeLayer(this.radiusCircle);
+          }
+
+          // Update map view
+          this.map.setView([latitude, longitude], 15);
 
           // Add user marker
           const userMarker = this.createUserMarker([latitude, longitude]);
           userMarker.addTo(this.map);
+          this.markers.push(userMarker);
 
           resolve({ latitude, longitude });
         },
@@ -56,10 +63,23 @@ const MapHandler = {
 
   updateMapLocation(locationString) {
     const [lat, lng] = locationString.split(',').map((coord) => parseFloat(coord.trim()));
-    if (lat && lng) {
-      this.map.setView([lat, lng], 15);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      // Clear existing markers and circle
       this.clearMarkers();
-      this.addMarker([lat, lng], 'Lokasi Pencarian');
+      if (this.radiusCircle) {
+        this.map.removeLayer(this.radiusCircle);
+      }
+
+      // Update map view
+      this.map.setView([lat, lng], 15);
+
+      // Add new marker
+      this.addMarker([lat, lng], 'Lokasi Anda', 'user');
+
+      // Trigger a map resize
+      setTimeout(() => {
+        this.map.invalidateSize();
+      }, 100);
     }
   },
 
@@ -81,18 +101,29 @@ const MapHandler = {
           iconSize: [24, 24]
         });
         break;
-      case 'result':
+      case 'seller':
         icon = L.divIcon({
-          html: '<i class="fas fa-map-marker-alt fa-2x text-red-600"></i>',
-          className: 'result-location-marker',
+          html: '<i class="fas fa-store fa-2x text-red-600"></i>',
+          className: 'seller-location-marker',
+          iconSize: [24, 24]
+        });
+        break;
+      case 'buyer':
+        icon = L.divIcon({
+          html: '<i class="fas fa-shopping-cart fa-2x text-green-600"></i>',
+          className: 'buyer-location-marker',
           iconSize: [24, 24]
         });
         break;
       default:
-        icon = null;
+        icon = L.divIcon({
+          html: '<i class="fas fa-map-marker-alt fa-2x text-primary-600"></i>',
+          className: 'default-location-marker',
+          iconSize: [24, 24]
+        });
       }
 
-      const marker = L.marker(coordinates, icon ? { icon } : {})
+      const marker = L.marker(coordinates, { icon })
         .bindPopup(popupContent);
 
       marker.addTo(this.map);
@@ -106,59 +137,75 @@ const MapHandler = {
   },
 
   updateMarkers(results) {
-    this.clearMarkers();
+    try {
+      this.clearMarkers();
 
-    // Add markers for sellers
-    results.sellers.forEach((seller) => {
-      if (seller.location?.coordinates) {
-        this.addMarker(
-          [seller.location.coordinates[1], seller.location.coordinates[0]],
-          `
-            <div>
-              <strong>${seller.name}</strong><br>
-              ${seller.category}<br>
-              Rp ${seller.price.amount.toLocaleString()}/${seller.stock.unit}
-            </div>
-          `,
-          'seller'
-        );
+      if (!results || (typeof results !== 'object')) {
+        console.log('No valid results to display on map');
+        return;
       }
-    });
 
-    // Add markers for buyers
-    results.buyers.forEach((buyer) => {
-      if (buyer.location?.coordinates) {
-        this.addMarker(
-          [buyer.location.coordinates[1], buyer.location.coordinates[0]],
-          `
-            <div>
-              <strong>Dicari: ${buyer.category}</strong><br>
-              ${buyer.amount.value} ${buyer.amount.unit}<br>
-              Rp ${buyer.price.amount.toLocaleString()}/${buyer.amount.unit}
-            </div>
-          `,
-          'buyer'
-        );
+      // Handle sellers
+      const sellers = results.sellers || [];
+      const buyers = results.buyers || [];
+
+      sellers.forEach((seller) => {
+        if (seller?.location?.coordinates) {
+          const [lng, lat] = seller.location.coordinates;
+          this.addMarker(
+            [lat, lng],
+            this._createSellerPopup(seller),
+            'seller'
+          );
+        }
+      });
+
+      buyers.forEach((buyer) => {
+        if (buyer?.location?.coordinates) {
+          const [lng, lat] = buyer.location.coordinates;
+          this.addMarker(
+            [lat, lng],
+            this._createBuyerPopup(buyer),
+            'buyer'
+          );
+        }
+      });
+
+      // Update radius circle if coordinates exist
+      if (results.coordinates && results.radius) {
+        this.updateRadiusCircle(results.coordinates, results.radius);
       }
-    });
 
-    if (results.coordinates) {
-      this.updateRadiusCircle(results.coordinates[1], results.coordinates[0], results.radius || 5);
+      this.fitMapToMarkers();
+
+    } catch (error) {
+      console.error('Error updating markers:', error);
     }
-
-    this.fitMapToMarkers();
   },
 
-  updateRadiusCircle(coordinates, radiusKm) {
+  updateRadiusCircle(coordinates, radiusKm = 5) {
     if (this.radiusCircle) {
       this.map.removeLayer(this.radiusCircle);
     }
 
-    if (Array.isArray(coordinates) && coordinates.length === 2) {
-      const [lat, lng] = coordinates;
+    // Validasi coordinates dan radius
+    if (!Array.isArray(coordinates) || coordinates.length !== 2 || !radiusKm) {
+      console.log('Invalid coordinates or radius');
+      return;
+    }
 
+    // Pastikan coordinates dan radius adalah angka valid
+    const [lng, lat] = coordinates;
+    const radius = parseFloat(radiusKm);
+
+    if (isNaN(lat) || isNaN(lng) || isNaN(radius)) {
+      console.log('Invalid coordinates or radius values');
+      return;
+    }
+
+    try {
       this.radiusCircle = L.circle([lat, lng], {
-        radius: radiusKm * 1000,
+        radius: radius * 1000, // Convert to meters
         fill: true,
         fillColor: '#16a34a',
         fillOpacity: 0.1,
@@ -169,7 +216,47 @@ const MapHandler = {
       // Update map view to show the entire circle
       const bounds = this.radiusCircle.getBounds();
       this.map.fitBounds(bounds);
+    } catch (error) {
+      console.error('Error creating radius circle:', error);
     }
+  },
+
+  _createSellerPopup(seller) {
+    return `
+      <div class="popup-content">
+        <h3 class="font-bold">${seller.name || 'Tidak ada nama'}</h3>
+        <p>Kategori: ${seller.category || '-'}</p>
+        <p>Stok: ${seller.stock?.amount || 0} ${seller.stock?.unit || 'kg'}</p>
+        <p>Harga: Rp ${seller.price?.amount?.toLocaleString() || 0}/${seller.stock?.unit || 'kg'}</p>
+        <div class="mt-2">
+          <button onclick="window.location.hash='#/product/${seller._id}'"
+                  class="bg-primary-600 text-white px-2 py-1 rounded text-sm">
+            Detail
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  _createBuyerPopup(buyer) {
+    return `
+      <div class="popup-content p-2">
+        <h3 class="font-bold mb-2">Dicari: ${buyer.category}</h3>
+        <p class="text-sm mb-1">Jumlah: ${buyer.amount?.value || 0} ${buyer.amount?.unit || 'kg'}</p>
+        <p class="text-sm mb-1">Harga: Rp ${buyer.price?.amount?.toLocaleString() || 0}/${buyer.amount?.unit || 'kg'}</p>
+        <p class="text-sm mb-2">${buyer.description || ''}</p>
+        <div class="mt-2 flex space-x-2">
+          <button onclick="window.open('https://wa.me/${buyer.buyer?.phone?.replace(/\D/g, '')}')"
+                  class="bg-green-500 text-white px-2 py-1 rounded text-sm">
+            <i class="fab fa-whatsapp"></i> WA
+          </button>
+          <button onclick="window.open('tel:${buyer.buyer?.phone}')"
+                  class="bg-primary-600 text-white px-2 py-1 rounded text-sm">
+            <i class="fas fa-phone"></i> Telepon
+          </button>
+        </div>
+      </div>
+    `;
   },
 
   clearMarkers() {

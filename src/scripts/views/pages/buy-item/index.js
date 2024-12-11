@@ -134,12 +134,12 @@ const BuyItemPage = {
 
   async _handleSubmit(event, isEdit) {
     try {
-      const form = event.target;
-      const submitButton = form.querySelector('button[type="submit"]');
+      event.preventDefault();
+      const submitButton = event.target.querySelector('button[type="submit"]');
       submitButton.disabled = true;
       submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
 
-      const formData = new FormData(form);
+      const formData = new FormData(event.target);
       const buyerData = {
         category: formData.get('category'),
         description: formData.get('description'),
@@ -153,7 +153,7 @@ const BuyItemPage = {
         },
         location: {
           type: 'Point',
-          coordinates: [0, 0], // You might want to get actual coordinates
+          coordinates: [0, 0],
           address: formData.get('address')
         }
       };
@@ -185,8 +185,7 @@ const BuyItemPage = {
       console.error('Error:', error);
       alert(error.message || 'Terjadi kesalahan saat menyimpan data');
     } finally {
-      // eslint-disable-next-line no-undef
-      const submitButton = form.querySelector('button[type="submit"]');
+      const submitButton = event.target.querySelector('button[type="submit"]');
       submitButton.disabled = false;
       submitButton.innerHTML = isEdit ? 'Simpan Perubahan' : 'Simpan Penawaran';
     }

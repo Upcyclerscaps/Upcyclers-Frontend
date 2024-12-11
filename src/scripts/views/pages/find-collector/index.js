@@ -117,7 +117,7 @@ const FindCollectorPage = {
     return `
       <div class="md:col-span-2">
         <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-          <div id="map" class="h-96 rounded-lg bg-gray-100"></div>
+          <div id="map" class="h-[400px] w-full rounded-lg bg-gray-100"></div>
         </div>
         <div id="searchResults" class="grid grid-cols-1 gap-4"></div>
       </div>

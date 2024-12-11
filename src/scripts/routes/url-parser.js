@@ -1,49 +1,47 @@
 /* eslint-disable linebreak-style */
 const UrlParser = {
-  // Parses the active URL and combines it with the appropriate route
   parseActiveUrlWithCombiner() {
     const url = window.location.hash.slice(1).toLowerCase();
     const splitedUrl = this._splitUrl(url);
     return this._urlCombiner(splitedUrl);
   },
 
-  // Parses the active URL without combining it
   parseActiveUrlWithoutCombiner() {
     const url = window.location.hash.slice(1).toLowerCase();
     return this._splitUrl(url);
   },
 
-  // Splits the URL into resource and id
   _splitUrl(url) {
     const urlsSplit = url.split('/');
-    const resource = `/${urlsSplit[1]}${urlsSplit[2] ? `/${urlsSplit[2]}` : ''}`;
-    const id = urlsSplit[3] || this._parseId(urlsSplit[4]); // Handle query string if present
 
+    // Handle berbagai pola URL
+    if (urlsSplit.length === 4 && urlsSplit[2] === 'edit') {
+      // Format: /resource/edit/id
+      return {
+        resource: `/${urlsSplit[1]}/edit`,
+        id: urlsSplit[3]
+      };
+    } else if (urlsSplit.length === 3) {
+      // Format: /resource/id
+      return {
+        resource: `/${urlsSplit[1]}`,
+        id: urlsSplit[2]
+      };
+    }
+
+    // Format: /resource
     return {
-      resource,
-      id,
+      resource: `/${urlsSplit[1]}`,
+      id: null
     };
   },
 
-  // Parses the ID from the query string
-  _parseId(queryString) {
-    if (!queryString) return null;
-
-    const params = new URLSearchParams(queryString);
-    return params.get('id');
-  },
-
-  // Combines the resource and id into a full route
   _urlCombiner(splitedUrl) {
-    const editRoutes = {
-      '/sell-item/edit': '/sell-item/edit/:id',
-      '/buy-item/edit': '/buy-item/edit/:id',
-    };
-
-    return editRoutes[splitedUrl.resource] && splitedUrl.id
-      ? editRoutes[splitedUrl.resource]
-      : splitedUrl.resource;
-  },
+    if (splitedUrl.id) {
+      return `${splitedUrl.resource}/:id`;
+    }
+    return splitedUrl.resource;
+  }
 };
 
 export default UrlParser;

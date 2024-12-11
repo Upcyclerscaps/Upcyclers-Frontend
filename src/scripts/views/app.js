@@ -24,6 +24,12 @@ class App {
 
   async renderPage() {
     try {
+
+      if (window.location.pathname === '/' && !window.location.hash) {
+        window.location.hash = '#/';
+        return;
+      }
+
       const url = UrlParser.parseActiveUrlWithCombiner();
 
       // Check if trying to access auth page while logged in

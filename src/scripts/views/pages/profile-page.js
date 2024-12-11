@@ -251,8 +251,7 @@ const Profile = {
                     class="text-primary-600 hover:text-primary-700">
               <i class="fas fa-edit"></i>
             </button>
-            <button onclick="this._deleteItem('${item._id}', '${type}')"
-                    class="text-red-600 hover:text-red-700">
+            <button data-delete-id="${item._id}" data-type="${type}" class="text-red-600 hover:text-red-700">
               <i class="fas fa-trash"></i>
             </button>
           </div>

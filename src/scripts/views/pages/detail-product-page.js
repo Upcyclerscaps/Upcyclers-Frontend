@@ -1,14 +1,17 @@
 /* eslint-disable linebreak-style */
-/* eslint-disable no-unused-vars */
 
 import API_ENDPOINT from '../../globals/api-endpoint';
 
 const DetailProductPage = {
-  async render(productId) {
+  async render() {
     if (!localStorage.getItem('token')) {
       window.location.hash = '#/auth';
       return '';
     }
+
+    const url = window.location.hash;
+    // eslint-disable-next-line no-unused-vars
+    const id = url.substring(url.lastIndexOf('/') + 1);
 
     return `
       <section class="pt-24 pb-12">
@@ -31,13 +34,12 @@ const DetailProductPage = {
   async afterRender() {
     try {
       const url = window.location.hash;
-      const id = url.split('?id=')[1];
+      const id = url.split('/')[2];  // Ambil ID dari format baru
 
       if (!id) {
         throw new Error('Product ID not found');
       }
 
-      // Add auth header
       const response = await fetch(`${API_ENDPOINT.GET_PRODUCT_DETAIL(id)}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

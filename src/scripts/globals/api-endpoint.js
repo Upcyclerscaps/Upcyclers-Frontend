@@ -8,6 +8,7 @@ const API_ENDPOINT = {
   LOGOUT: `${CONFIG.BASE_URL}/auth/logout`,
   USER_PROFILE: `${CONFIG.BASE_URL}/auth/profile`,
   UPDATE_PROFILE: `${CONFIG.BASE_URL}/auth/profile`,
+  UPDATE_PASSWORD: `${CONFIG.BASE_URL}/auth/profile/password`,
 
   // Product endpoints
   CREATE_PRODUCT: `${CONFIG.BASE_URL}/products`,

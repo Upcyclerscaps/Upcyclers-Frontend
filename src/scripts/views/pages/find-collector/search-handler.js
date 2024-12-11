@@ -21,35 +21,38 @@ const SearchHandler = {
       const radiusSelect = document.getElementById('radiusFilter');
 
       try {
-        const position = await this._getCurrentPosition();
-        const { latitude, longitude } = position.coords;
+        // Update button state
+        const button = document.querySelector('#getCurrentLocation');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const position = await this.mapHandler.getCurrentLocation();
+        const { latitude, longitude } = position;
 
         // Set coordinates
         const locationString = `${latitude},${longitude}`;
         locationInput.value = locationString;
+        locationInput.dataset.coordinates = locationString;
 
-        // Update map with user location
-        if (this.mapHandler) {
-          this.mapHandler.updateMapLocation(locationString);
+        // Update map view and radius
+        const radius = parseInt(radiusSelect?.value || 5);
+        this.mapHandler.updateMapLocation(locationString);
+        this.mapHandler.updateRadiusCircle([longitude, latitude], radius);
 
-          // Update radius circle if the method exists
-          if (typeof this.mapHandler.updateRadiusCircle === 'function') {
-            const radius = parseInt(radiusSelect?.value || 5);
-            this.mapHandler.updateRadiusCircle([latitude, longitude], radius);
-          }
-        }
-
-        // Get address
-        const address = await this._getAddress(latitude, longitude);
+        // Get and set address
+        const address = await this.mapHandler.reverseGeocode(latitude, longitude);
         if (address) {
           locationInput.value = address;
-          // Store coordinates as data attribute
-          locationInput.dataset.coordinates = locationString;
         }
 
       } catch (error) {
         console.error('Error:', error);
         alert('Gagal mendapatkan lokasi. Pastikan GPS aktif.');
+      } finally {
+        // Reset button state
+        const button = document.querySelector('#getCurrentLocation');
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-location-arrow"></i>';
       }
     });
 
@@ -57,11 +60,11 @@ const SearchHandler = {
     const radiusSelect = document.getElementById('radiusFilter');
     radiusSelect?.addEventListener('change', (e) => {
       const locationInput = document.querySelector('#location');
-      const locationString = locationInput.dataset.coordinates || locationInput.value;
+      const coordinates = locationInput.dataset.coordinates;
 
-      if (locationString && this.mapHandler && typeof this.mapHandler.updateRadiusCircle === 'function') {
-        const [lat, lng] = locationString.split(',').map((coord) => parseFloat(coord.trim()));
-        this.mapHandler.updateRadiusCircle([lat, lng], parseInt(e.target.value));
+      if (coordinates && this.mapHandler) {
+        const [lat, lng] = coordinates.split(',').map((coord) => parseFloat(coord));
+        this.mapHandler.updateRadiusCircle([lng, lat], parseInt(e.target.value));
       }
     });
 
@@ -131,16 +134,25 @@ const SearchHandler = {
       // Get search results
       const results = await this._fetchResults(searchType, formData);
 
-      // Update UI and map dengan data yang sesuai berdasarkan tipe pencarian
-      const displayData = searchType === 'seller' ? results.sellers : results.buyers;
+      // Format results properly
+      const formattedResults = {
+        sellers: [],
+        buyers: [],
+        coordinates: results.coordinates,
+        radius: formData.radius || 5 // Tambahkan radius
+      };
 
-      this.resultsHandler.displayResults(displayData, {
-        type: searchType,
-        coordinates: results.coordinates
-      });
+      if (searchType === 'seller') {
+        formattedResults.sellers = results.data || [];
+      } else {
+        formattedResults.buyers = results.data || [];
+      }
 
-      // Update markers on map
-      this.mapHandler.updateMarkers(displayData);
+      // Update UI dan map
+      this.resultsHandler.displayResults(formattedResults);
+      if (this.mapHandler) {
+        this.mapHandler.updateMarkers(formattedResults);
+      }
 
     } catch (error) {
       console.error('Search error:', error);
@@ -168,7 +180,6 @@ const SearchHandler = {
 
   async _fetchResults(searchType, formData) {
     const [lat, lng] = formData.location.split(',').map((coord) => parseFloat(coord.trim()));
-    const coordinates = [lng, lat];
 
     try {
       const token = localStorage.getItem('token');
@@ -177,15 +188,18 @@ const SearchHandler = {
       }
 
       const params = new URLSearchParams({
-        longitude: coordinates[0],
-        latitude: coordinates[1],
+        longitude: lng,
+        latitude: lat,
         category: formData.category || '',
         radius: formData.radius || 5
       });
 
-      const endpoint = searchType === 'seller'
-        ? API_ENDPOINT.FIND_NEARBY_SELLERS
-        : API_ENDPOINT.FIND_NEARBY_BUYERS;
+      let endpoint;
+      if (searchType === 'collector') {
+        endpoint = API_ENDPOINT.BUY_OFFERS; // Endpoint untuk penawaran beli
+      } else {
+        endpoint = API_ENDPOINT.GET_PRODUCTS; // Endpoint untuk produk
+      }
 
       const response = await fetch(`${endpoint}?${params}`, {
         headers: {
@@ -194,19 +208,17 @@ const SearchHandler = {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Gagal mencari data');
+        throw new Error('Gagal mencari data');
       }
 
-      const data = await response.json();
-      return {
-        sellers: searchType === 'seller' ? data.data || [] : [],
-        buyers: searchType === 'buyer' ? data.data || [] : [],
-        coordinates
-      };
+      const responseData = await response.json();
 
+      return {
+        data: responseData.data || [],
+        coordinates: [lng, lat]
+      };
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('Fetch error:', error);
       throw error;
     }
   }

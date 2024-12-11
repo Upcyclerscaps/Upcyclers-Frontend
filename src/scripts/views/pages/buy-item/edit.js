@@ -150,7 +150,6 @@ const EditBuyItemPage = {
       submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
 
       const formData = new FormData(event.target);
-
       const updateData = {
         category: formData.get('category'),
         description: formData.get('description'),
@@ -163,11 +162,15 @@ const EditBuyItemPage = {
           negotiable: true
         },
         location: {
+          type: 'Point',
+          coordinates: [106.816666, -6.200000], // Default atau gunakan koordinat yang sebenarnya
           address: formData.get('address')
         }
       };
 
-      const response = await fetch(`${API_ENDPOINT.BUY_OFFERS}/${offerId}`, {
+      console.log('Sending update data:', updateData); // Debug log
+
+      const response = await fetch(`${API_ENDPOINT.BUY_OFFER_DETAIL(offerId)}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -177,7 +180,8 @@ const EditBuyItemPage = {
       });
 
       if (!response.ok) {
-        throw new Error('Gagal mengupdate penawaran');
+        const error = await response.json();
+        throw new Error(error.message || 'Gagal mengupdate penawaran');
       }
 
       alert('Penawaran berhasil diupdate!');

@@ -70,7 +70,7 @@ const TemplateCreator = {
   createProductCard(product) {
     return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer"
-             onclick="window.location.hash = '#/product?id=${product._id}'">
+            onclick="window.location.hash = '#/product/${product._id}'">
           <img 
             src="${this._getProductImage(product)}" 
             alt="${product.name}"
