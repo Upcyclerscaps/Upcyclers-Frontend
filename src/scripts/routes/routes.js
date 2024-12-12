@@ -4,7 +4,8 @@ import JualBeliPage from '../views/pages/jual-beli/index';
 import FindCollectorPage from '../views/pages/find-collector/index';
 import Auth from '../views/pages/auth-page';
 import About from '../views/pages/about-page';
-import ProfilePage from '../views/pages/profile';
+import Profile from '../views/pages/profile-page';
+// import ProfilePage from '../views/pages/profile';
 import EditProfile from '../views/pages/edit-profile-page';
 import SellItemPage from '../views/pages/sell-item/index';
 import BuyItemPage from '../views/pages/buy-item';
@@ -20,7 +21,7 @@ import EditBuyItemPage from '../views/pages/buy-item/edit';
 const routes = {
   '/': Home,
   '/auth': Auth,
-  '/profile': ProfilePage,
+  '/profile': Profile,
   '/edit-profile': EditProfile,
   '/sell-item': SellItemPage,
   '/buy-item': BuyItemPage,
