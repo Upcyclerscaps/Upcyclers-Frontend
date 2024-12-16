@@ -14,24 +14,29 @@ const UrlParser = {
   _splitUrl(url) {
     const urlsSplit = url.split('/');
 
-    // Handle berbagai pola URL
+    // Handle admin routes
+    if (urlsSplit[1] === 'admin') {
+      return {
+        resource: urlsSplit.length > 2 ? `/admin/${urlsSplit[2]}` : '/admin',
+        id: urlsSplit[3] || null
+      };
+    }
+
+    // Handle existing route patterns
     if (urlsSplit.length === 4 && urlsSplit[2] === 'edit') {
-      // Format: /resource/edit/id
       return {
         resource: `/${urlsSplit[1]}/edit`,
         id: urlsSplit[3]
       };
     } else if (urlsSplit.length === 3) {
-      // Format: /resource/id
       return {
         resource: `/${urlsSplit[1]}`,
         id: urlsSplit[2]
       };
     }
 
-    // Format: /resource
     return {
-      resource: `/${urlsSplit[1]}`,
+      resource: `/${urlsSplit[1] || ''}`,
       id: null
     };
   },

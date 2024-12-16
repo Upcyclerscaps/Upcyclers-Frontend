@@ -11,22 +11,28 @@ class CustomHeader extends HTMLElement {
       <header id="mainHeader" class="bg-primary-800 fixed w-full top-0 z-50 shadow-md">
         <div class="container mx-auto px-4">
           <nav class="flex items-center justify-between h-16">
-            <!-- Left Side: Logo and Basic Nav -->
+            <!-- Left Side -->
             <div class="flex items-center space-x-8">
+              <!-- Toggle Sidebar Button (Only visible on admin pages) -->
+              <button id="toggleSidebarBtn" 
+                      class="hidden text-white hover:text-primary-200 md:hidden px-2 py-1 rounded-lg transition-colors focus:outline-none" 
+                      aria-label="Toggle Sidebar">
+                <i class="fas fa-bars text-xl"></i>
+              </button>
               <!-- Logo -->
               <a href="#/" class="text-xl font-bold text-white flex items-center">
                 <i class="fas fa-recycle mr-2"></i>
                 Upcyclers
               </a>
 
-              <!-- Basic Navigation (Beranda & Tentang) -->
+              <!-- Basic Navigation -->
               <div class="hidden md:flex items-center space-x-8">
                 <a href="#/" class="text-white hover:text-primary-200 transition-colors">Beranda</a>
                 <a href="#/about" class="text-white hover:text-primary-200 transition-colors">Tentang</a>
               </div>
             </div>
 
-            <!-- Right Side: Feature Nav & Auth -->
+            <!-- Center/Right Side Navigation (Desktop) -->
             <div class="hidden md:flex items-center space-x-8">
               ${isAuthenticated ? `
                 <!-- Feature Navigation -->
@@ -39,13 +45,23 @@ class CustomHeader extends HTMLElement {
                 <a href="#/find-collector" class="text-white hover:text-primary-200 transition-colors">
                   <i class="fas fa-map-marker-alt mr-1"></i>Cari
                 </a>
-                
-                <!-- User Menu -->
+                ${user.role === 'admin' ? `
+                  <a href="#/admin" class="text-white hover:text-primary-200 transition-colors">
+                    <i class="fas fa-cog mr-1"></i>Admin Panel
+                  </a>
+                ` : ''}
+              ` : ''}
+            </div>
+
+            <!-- Right Side: Profile/Auth -->
+            <div class="flex items-center space-x-4">
+              ${isAuthenticated ? `
+                <!-- Profile Dropdown -->
                 <div class="relative">
                   <button id="userMenuBtn" class="flex items-center space-x-2 text-white">
                     <img src="${user.profileImage || 'https://via.placeholder.com/32'}" 
-                        alt="Profile" 
-                        class="w-8 h-8 rounded-full object-cover border-2 border-white">
+                         alt="Profile" 
+                         class="w-8 h-8 rounded-full object-cover border-2 border-white">
                   </button>
                   <div id="userMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
                     <a href="#/profile" class="block px-4 py-2 text-gray-700 hover:bg-primary-50 hover:text-primary-600">
@@ -92,6 +108,13 @@ class CustomHeader extends HTMLElement {
               <i class="fas fa-map-marker-alt text-xl"></i>
               <span class="text-xs mt-1">Cari</span>
             </a>
+
+            ${user.role === 'admin' ? `
+              <a href="#/admin" class="flex flex-col items-center text-white hover:text-primary-200">
+                <i class="fas fa-cog text-xl"></i>
+                <span class="text-xs mt-1">Admin</span>
+              </a>
+            ` : ''}
           ` : `
             <!-- Menu untuk user yang belum login -->
             <a href="#/about" class="flex flex-col items-center text-white hover:text-primary-200">
@@ -134,6 +157,58 @@ class CustomHeader extends HTMLElement {
       logoutButton.addEventListener('click', () => {
         AuthService.logout();
         window.location.reload();
+      });
+    }
+
+    // Toggle Sidebar Button for Admin Panel
+    const toggleSidebarBtn = this.querySelector('#toggleSidebarBtn');
+
+    if (toggleSidebarBtn) {
+    // Show/hide toggle button based on current page
+      const checkAdminPage = () => {
+        if (window.location.hash.startsWith('#/admin')) {
+          toggleSidebarBtn.classList.remove('hidden');
+        } else {
+          toggleSidebarBtn.classList.add('hidden');
+        }
+      };
+
+      // Check initially
+      checkAdminPage();
+
+      // Check when hash changes
+      window.addEventListener('hashchange', checkAdminPage);
+
+      // Handle click event
+      toggleSidebarBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+          sidebar.classList.toggle('hidden');
+
+          // Store sidebar state
+          const isOpen = !sidebar.classList.contains('hidden');
+          localStorage.setItem('adminSidebarOpen', isOpen);
+
+          // Update button icon
+          const icon = toggleSidebarBtn.querySelector('i');
+          icon.classList.remove('fa-bars', 'fa-times');
+          icon.classList.add(isOpen ? 'fa-times' : 'fa-bars');
+        }
+      });
+
+      // Close sidebar when clicking outside (on mobile)
+      document.addEventListener('click', (e) => {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar &&
+          !sidebar.contains(e.target) &&
+          !toggleSidebarBtn.contains(e.target) &&
+          !sidebar.classList.contains('hidden')) {
+          sidebar.classList.add('hidden');
+          const icon = toggleSidebarBtn.querySelector('i');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
       });
     }
   }

@@ -5,7 +5,6 @@ import FindCollectorPage from '../views/pages/find-collector/index';
 import Auth from '../views/pages/auth-page';
 import About from '../views/pages/about-page';
 import Profile from '../views/pages/profile-page';
-// import ProfilePage from '../views/pages/profile';
 import EditProfile from '../views/pages/edit-profile-page';
 import SellItemPage from '../views/pages/sell-item/index';
 import BuyItemPage from '../views/pages/buy-item';
@@ -17,6 +16,12 @@ import EditBuyOfferPage from '../views/pages/buy-offers/edit';
 
 import EditSellItemPage from '../views/pages/sell-item/edit';
 import EditBuyItemPage from '../views/pages/buy-item/edit';
+
+// Import admin pages
+import AdminDashboard from '../views/pages/admin/dashboard';
+import AdminProducts from '../views/pages/admin/products';
+import AdminBuyOffers from '../views/pages/admin/buy-offers';
+import AdminUsers from '../views/pages/admin/users';
 
 const routes = {
   '/': Home,
@@ -35,6 +40,11 @@ const routes = {
   '/buy-offer/edit/:id': EditBuyOfferPage,
   '/sell-item/edit/:id': EditSellItemPage,
   '/buy-item/edit/:id': EditBuyItemPage,
+
+  '/admin': AdminDashboard,
+  '/admin/users': AdminUsers,
+  '/admin/products': AdminProducts,
+  '/admin/buy-offers': AdminBuyOffers,
 };
 
 export default routes;

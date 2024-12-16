@@ -30,6 +30,20 @@ const API_ENDPOINT = {
   // Location-based search
   FIND_NEARBY_SELLERS: `${CONFIG.BASE_URL}/users/nearby-sellers`,
   FIND_NEARBY_BUYERS: `${CONFIG.BASE_URL}/users/nearby-buyers`,
+
+  // Admin endpoints
+  ADMIN: {
+    DASHBOARD_STATS: `${CONFIG.BASE_URL}/admin/dashboard-stats`,
+    USERS: `${CONFIG.BASE_URL}/admin/users`,
+    GET_USER: (id) => `${CONFIG.BASE_URL}/admin/users/${id}`,
+    UPDATE_USER: (id) => `${CONFIG.BASE_URL}/admin/users/${id}`,
+    UPDATE_USER_ROLE: (id) => `${CONFIG.BASE_URL}/admin/users/${id}/role`,
+    DELETE_USER: (id) => `${CONFIG.BASE_URL}/admin/users/${id}`,
+    GET_PRODUCTS: `${CONFIG.BASE_URL}/admin/products`,
+    DELETE_PRODUCT: (id) => `${CONFIG.BASE_URL}/admin/products/${id}`,
+    GET_BUY_OFFERS: `${CONFIG.BASE_URL}/admin/buy-offers`,
+    DELETE_BUY_OFFER: (id) => `${CONFIG.BASE_URL}/admin/buy-offers/${id}`,
+  }
 };
 
 export default API_ENDPOINT;
