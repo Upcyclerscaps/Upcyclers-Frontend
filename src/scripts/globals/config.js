@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 const CONFIG = {
-  BASE_URL: 'http://upcyclers.myvnc.com:5000/api/v1',
-  BASE_IMAGE_URL: 'http://upcyclers.myvnc.com:5000/images',
+  BASE_URL: 'https://upcyclers.myvnc.com:5000/api/v1',
+  BASE_IMAGE_URL: 'https://upcyclers.myvnc.com:5000/images',
   CACHE_NAME: 'upcyclers-v1',
   DATABASE_NAME: 'upcyclers-database',
   DATABASE_VERSION: 1,
