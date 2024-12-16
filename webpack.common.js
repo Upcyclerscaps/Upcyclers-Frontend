@@ -47,7 +47,7 @@ module.exports = {
       swDest: './sw.bundle.js',
       runtimeCaching: [
         {
-          urlPattern: ({ url }) => url.href.startsWith('http://localhost:5000/api/v1'),
+          urlPattern: ({ url }) => url.href.startsWith('http://upcyclers.myvnc.com:5000/api/v1'),
           handler: 'StaleWhileRevalidate',
           options: {
             cacheName: 'Upcyclers-api',
