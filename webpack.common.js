@@ -1,9 +1,10 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable no-undef */
-/* eslint-disable linebreak-style */
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
+
 
 module.exports = {
   entry: {
@@ -39,6 +40,18 @@ module.exports = {
         {
           from: path.resolve(__dirname, 'src/public/'),
           to: path.resolve(__dirname, 'dist/'),
+        },
+      ],
+    }),
+    new WorkboxWebpackPlugin.GenerateSW({
+      swDest: './sw.bundle.js',
+      runtimeCaching: [
+        {
+          urlPattern: ({ url }) => url.href.startsWith('http://localhost:5000/api/v1'),
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'Upcyclers-api',
+          },
         },
       ],
     }),
