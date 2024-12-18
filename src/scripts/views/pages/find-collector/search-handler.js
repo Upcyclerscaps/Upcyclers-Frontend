@@ -111,7 +111,7 @@ const SearchHandler = {
 
         // Update form based on type
         const isSellerSearch = type.dataset.type === 'seller';
-        categoryLabel.textContent = isSellerSearch ? 'Kategori Barang yang Ingin Dijual' : 'Kategori Barang yang Dicari';
+        categoryLabel.textContent = isSellerSearch ? 'Kategori Barang yang Dicari' : 'Kategori Barang yang Ingin Dijual';
         priceRangeDiv.classList.toggle('hidden', !isSellerSearch);
 
         // Update radio button
