@@ -120,6 +120,7 @@ const AdminDashboard = {
   },
 
   _updateStats(stats = {}) {
+
     const totalUsersElement = document.getElementById('totalUsers');
     const totalProductsElement = document.getElementById('totalProducts');
     const totalBuyOffersElement = document.getElementById('totalBuyOffers');
