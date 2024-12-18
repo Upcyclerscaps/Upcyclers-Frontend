@@ -10,17 +10,15 @@ const AdminLayout = {
     }
 
     return `
-        <div class="flex bg-gray-100 min-h-screen">
-          <!-- Sidebar -->
-          <div id="sidebar" class="w-64 bg-primary-800 text-white fixed h-full overflow-y-auto pt-16 transition-all duration-300 ease-in-out transform">
-            <div class="p-4">
-              <h2 class="text-lg font-semibold mb-6 pl-2">Admin Dashboard</h2>
-              <nav class="space-y-1">
-                <a href="#/admin" 
-                    class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-700 transition-colors group">
-                    <i class="fas fa-chart-line text-gray-300 group-hover:text-white mr-3"></i>
-                    <span>Dashboard</span>
-                </a>
+      <div class="flex min-h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="admin-sidebar fixed h-full bg-primary-800 text-white w-64 pt-16 transition-transform duration-300 ease-in-out transform md:translate-x-0 z-30">
+          <div class="p-4">
+            <nav class="space-y-2">
+              <a href="#/admin" class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-700 transition-colors">
+                <i class="fas fa-chart-line w-6"></i>
+                <span>Dashboard</span>
+              </a>
                 <a href="#/admin/users" 
                     class="flex items-center px-4 py-3 rounded-lg hover:bg-primary-700 transition-colors group">
                     <i class="fas fa-users text-gray-300 group-hover:text-white mr-3"></i>
@@ -40,14 +38,14 @@ const AdminLayout = {
             </div>
           </div>
   
-          <!-- Main Content Area -->
-          <div id="mainContent" class="flex-1 transition-all duration-300 ease-in-out ml-64">
-            <div class="py-6 px-8 pt-24">
-              ${content}
-            </div>
+        <!-- Main Content -->
+        <div class="admin-content flex-1 transition-all duration-300 ease-in-out ml-64 pt-16">
+          <div class="p-6">
+            ${content}
           </div>
         </div>
-      `;
+      </div>
+    `;
   },
 
   afterRender() {

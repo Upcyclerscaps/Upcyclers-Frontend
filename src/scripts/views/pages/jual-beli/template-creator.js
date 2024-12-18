@@ -68,6 +68,8 @@ const TemplateCreator = {
   },
 
   createProductCard(product) {
+    console.log('Full product data:', product); // debugging
+
     return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer"
             onclick="window.location.hash = '#/product/${product._id}'">
@@ -84,12 +86,18 @@ const TemplateCreator = {
                 ${product.category}
               </span>
             </div>
-            <p class="text-gray-600 mb-2">${this._formatQuantity(product)}</p>
-            <p class="text-gray-600 mb-3">${this._getAddress(product)}</p>
+            <div class="text-gray-600 mb-2">
+              <i class="fas fa-box mr-1"></i>
+              ${this._formatQuantity(product)}
+            </div>
+            <div class="text-gray-600 mb-3">
+              <i class="fas fa-map-marker-alt mr-1"></i>
+              ${this._getAddress(product)}
+            </div>
             <div class="flex justify-between items-center">
-              <span class="text-lg font-bold text-primary-600">
+              <div class="text-lg font-bold text-primary-600">
                 ${this._formatPrice(product)}
-              </span>
+              </div>
               <button class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700">
                 Detail
               </button>
@@ -112,11 +120,17 @@ const TemplateCreator = {
   },
 
   _formatQuantity(product) {
-    if (product.stock && product.stock.amount !== undefined) {
-      return `${product.stock.amount} ${product.stock.unit || 'kg'} tersedia`;
-    } else if (product.quantity) {
-      return `${product.quantity} tersedia`;
+    console.log('Stock data:', product.stock); // debugging
+
+    // Perbaikan pengecekan stok
+    if (product.stock && typeof product.stock.amount === 'number' && product.stock.unit) {
+      return `${product.stock.amount.toLocaleString()} ${product.stock.unit} tersedia`;
     }
+    // Jika stock 0
+    if (product.stock?.amount === 0) {
+      return 'Stok habis';
+    }
+    // Default
     return 'Stok tidak tersedia';
   },
 
@@ -128,15 +142,18 @@ const TemplateCreator = {
   },
 
   _formatPrice(product) {
-    let price;
-    if (product.price && product.price.amount !== undefined) {
-      price = product.price.amount;
-    } else if (typeof product.price === 'number') {
-      price = product.price;
-    } else {
-      price = 0;
+    console.log('Price data:', product.price); // debugging
+    console.log('Stock data for unit:', product.stock); // debugging
+
+    // Perbaikan format harga
+    if (product.price && typeof product.price.amount === 'number') {
+      const price = `Rp ${product.price.amount.toLocaleString()}`;
+      const unit = product.stock?.unit ? `/${product.stock.unit}` : '';
+      const negotiable = product.price.negotiable ? ' (Nego)' : '';
+
+      return `${price}${unit}${negotiable}`;
     }
-    return `Rp ${price.toLocaleString()}/kg`;
+    return 'Harga tidak tersedia';
   },
 
   createNoProductsFound() {
