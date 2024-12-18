@@ -41,7 +41,7 @@ class CustomHeader extends HTMLElement {
                   <i class="fas fa-store mr-1"></i>Beli
                 </a>
                 <a href="#/buy-offers" class="text-white hover:text-primary-200 transition-colors">
-                  <i class="fas fa-list-alt mr-1"></i>Jual
+                  <i class="fas fa-list-alt mr-1"></i>Penawaran
                 </a>
                 <a href="#/find-collector" class="text-white hover:text-primary-200 transition-colors">
                   <i class="fas fa-map-marker-alt mr-1"></i>Cari
@@ -102,7 +102,7 @@ class CustomHeader extends HTMLElement {
             
             <a href="#/buy-offers" class="flex flex-col items-center text-white hover:text-primary-200">
               <i class="fas fa-list-alt text-xl"></i>
-              <span class="text-xs mt-1">Jual</span>
+              <span class="text-xs mt-1">Penawaran</span>
             </a>
 
             <a href="#/find-collector" class="flex flex-col items-center text-white hover:text-primary-200">

@@ -164,7 +164,11 @@ const Auth = {
       localStorage.setItem('token', loginJson.token);
       localStorage.setItem('user', JSON.stringify(loginJson.data.user));
 
-      window.location.hash = '#/';
+      localStorage.setItem('showWelcomeMessage', 'true');
+      console.log('Setting welcome message flag'); // Debug
+
+      // Redirect ke edit profile
+      window.location.hash = '#/edit-profile';
       window.location.reload();
     } catch (error) {
       console.error('Register error:', error);

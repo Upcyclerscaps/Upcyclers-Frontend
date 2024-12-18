@@ -157,9 +157,62 @@ const EditProfile = {
   },
 
   async afterRender() {
+    setTimeout(() => {
+      if (localStorage.getItem('showWelcomeMessage') === 'true') {
+        this._showWelcomeMessage();
+        localStorage.removeItem('showWelcomeMessage');
+      }
+    }, 500); // Delay 500ms
+
     this._initializeImageUpload();
     this._initializeMap();
     this._initializeForm();
+  },
+
+  _showWelcomeMessage() {
+    const messageHTML = `
+      <div id="welcomeMessage" 
+           class="fixed top-20 right-4 z-50 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-lg max-w-md animate-fade-in">
+        <div class="flex justify-between items-start">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-user-plus text-xl text-green-500 mt-1"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="font-bold text-green-800">Selamat Datang di Upcyclers! 👋</h3>
+              <p class="mt-1 text-sm">Lengkapi profil Anda sekarang untuk mengakses semua fitur Upcyclers.</p>
+            </div>
+          </div>
+          <button id="closeWelcomeMessage" 
+                  class="ml-4 text-green-500 hover:text-green-700 focus:outline-none">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', messageHTML);
+
+    // Attach event listener to the close button
+    document.getElementById('closeWelcomeMessage').addEventListener('click', () => {
+      this._hideWelcomeMessage();
+    });
+
+    // Auto dismiss setelah 15 detik
+    setTimeout(() => this._hideWelcomeMessage(), 15000);
+  },
+
+  _hideWelcomeMessage() {
+    const message = document.getElementById('welcomeMessage');
+    if (message) {
+      message.style.opacity = '0';
+      message.style.transform = 'translateX(100px)';
+      message.style.transition = 'all 0.5s ease-out';
+
+      setTimeout(() => {
+        message.remove();
+      }, 500);
+    }
   },
 
   _initializeImageUpload() {
