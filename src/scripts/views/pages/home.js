@@ -47,24 +47,72 @@ const Home = {
       <!-- Statistik Section -->
       <div class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
-          <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Dampak Sampah di Indonesia</h2>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="text-center">
-              <div class="text-3xl font-bold text-primary-600 mb-2">67.8 Juta</div>
-              <p class="text-gray-600">Ton sampah per tahun</p>
+          <h2 class="text-2xl md:text-3xl font-bold text-center mb-4">Permasalahan Sampah di Indonesia</h2>
+          <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto">
+            Berdasarkan data SIPSN tahun 2022, Indonesia menghadapi tantangan serius dalam pengelolaan sampah
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <!-- Timbulan Sampah -->
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+              <div class="text-3xl font-bold text-primary-600 mb-2">73.4 Juta</div>
+              <p class="text-gray-600 font-medium">Ton/Tahun</p>
+              <p class="text-sm text-gray-500 mt-2">Total timbulan sampah nasional pada tahun 2022</p>
             </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold text-primary-600 mb-2">11.6%</div>
-              <p class="text-gray-600">Sampah didaur ulang</p>
+
+            <!-- Sampah Terkelola -->
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+              <div class="text-3xl font-bold text-primary-600 mb-2">65.51%</div>
+              <p class="text-gray-600 font-medium">Sampah Terkelola</p>
+              <p class="text-sm text-gray-500 mt-2">Presentase sampah yang berhasil dikelola dari total timbulan</p>
             </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold text-primary-600 mb-2">72%</div>
-              <p class="text-gray-600">Sampah berakhir di TPA</p>
+
+            <!-- Sampah Tidak Terkelola -->
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+              <div class="text-3xl font-bold text-primary-600 mb-2">34.49%</div>
+              <p class="text-gray-600 font-medium">Sampah Tidak Terkelola</p>
+              <p class="text-sm text-gray-500 mt-2">Presentase sampah yang belum terkelola dengan baik</p>
             </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold text-primary-600 mb-2">17%</div>
-              <p class="text-gray-600">Bocor ke lingkungan</p>
+          </div>
+
+          <!-- Pengelolaan Sampah -->
+          <h3 class="text-xl md:text-2xl font-bold text-center mb-8">Komposisi Pengelolaan Sampah</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center p-4 bg-white rounded-lg shadow-md">
+              <div class="text-2xl font-bold text-primary-600 mb-2">41.71%</div>
+              <p class="text-gray-600">Sampah ditimbun di TPA</p>
             </div>
+            <div class="text-center p-4 bg-white rounded-lg shadow-md">
+              <div class="text-2xl font-bold text-primary-600 mb-2">14.11%</div>
+              <p class="text-gray-600">Sampah dikelola di sumber</p>
+            </div>
+            <div class="text-center p-4 bg-white rounded-lg shadow-md">
+              <div class="text-2xl font-bold text-primary-600 mb-2">9.69%</div>
+              <p class="text-gray-600">Sampah dikurangi di sumber</p>
+            </div>
+            <div class="text-center p-4 bg-white rounded-lg shadow-md">
+              <div class="text-2xl font-bold text-primary-600 mb-2">34.49%</div>
+              <p class="text-gray-600">Belum terkelola</p>
+            </div>
+          </div>
+
+          <!-- Sumber Data -->
+          <div class="text-center mt-12 text-sm text-gray-500">
+            Sumber: 
+            <a href="https://sipsn.menlhk.go.id" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="text-primary-600 hover:text-primary-700 underline">
+              Sistem Informasi Pengelolaan Sampah Nasional (SIPSN)
+            </a> 
+            Kementerian Lingkungan Hidup dan Kehutanan (KLHK) -
+            <a href="https://sipsn.menlhk.go.id/sipsn/public/data/timbulan" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="text-primary-600 hover:text-primary-700 underline">
+              Data Timbulan dan Pengelolaan Sampah
+            </a> 
+            tahun 2022
           </div>
         </div>
       </div>
