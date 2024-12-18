@@ -106,7 +106,7 @@ const Profile = {
         const type = deleteBtn.dataset.type;
 
         // Konfirmasi hanya sekali di sini
-        if (confirm(Hapus ${type === 'selling' ? 'barang' : 'penawaran'} ini?)) {
+        if (confirm(`Hapus ${type === 'selling' ? 'barang' : 'penawaran'} ini?`)) {
           await this._deleteItem(id, type);
         }
       }
@@ -140,7 +140,7 @@ const Profile = {
       try {
         const productsResponse = await fetch(API_ENDPOINT.USER_PRODUCTS, {
           headers: {
-            'Authorization': Bearer ${token},
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -154,7 +154,7 @@ const Profile = {
       try {
         const buyOffersResponse = await fetch(API_ENDPOINT.USER_BUY_OFFERS, {
           headers: {
-            'Authorization': Bearer ${token},
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -193,7 +193,7 @@ const Profile = {
 
       const response = await fetch(endpoint, {
         headers: {
-          'Authorization': Bearer ${token},
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -202,7 +202,7 @@ const Profile = {
       this._renderTabContent(tabName, data.data, container);
 
     } catch (error) {
-      console.error(Error loading ${tabName}:, error);
+      console.error(`Error loading ${tabName}:`, error);
       container.innerHTML = '<div class="text-center py-8 text-red-500">Gagal memuat data</div>';
     }
   },
@@ -242,8 +242,8 @@ const Profile = {
             <h3 class="font-medium">${type === 'selling' ? item.name : item.category}</h3>
             <p class="text-gray-600">Rp ${item.price.amount.toLocaleString()}</p>
             ${type === 'selling' ?
-    <p class="text-sm text-gray-500">${item.status}</p> :
-    <p class="text-sm text-gray-500">${item.amount.value} ${item.amount.unit}</p>
+    `<p class="text-sm text-gray-500">${item.status}</p>` :
+    `<p class="text-sm text-gray-500">${item.amount.value} ${item.amount.unit}</p>`
 }
           </div>
           <div class="flex space-x-2">
@@ -265,15 +265,15 @@ const Profile = {
       // Hapus konfirmasi di sini karena sudah ada di event listener
       let endpoint = '';
       if (type === 'selling') {
-        endpoint = ${API_ENDPOINT.DELETE_PRODUCT(itemId)};
+        endpoint = `${API_ENDPOINT.DELETE_PRODUCT(itemId)}`;
       } else {
-        endpoint = ${API_ENDPOINT.BUY_OFFERS}/${itemId};
+        endpoint = `${API_ENDPOINT.BUY_OFFERS}/${itemId}`;
       }
 
       const response = await fetch(endpoint, {
         method: 'DELETE',
         headers: {
-          'Authorization': Bearer ${localStorage.getItem('token')},
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         }
       });
