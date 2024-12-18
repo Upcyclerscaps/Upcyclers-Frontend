@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+// src/scripts/views/pages/admin/dashboard.js
 import AdminLayout from './components/admin-layout';
 import API_ENDPOINT from '../../../globals/api-endpoint';
 
@@ -45,6 +46,7 @@ const AdminDashboard = {
                 </div>
               </div>
             </div>
+          </div>
   
           <!-- Latest Activities Section -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mx-auto max-w-full">
