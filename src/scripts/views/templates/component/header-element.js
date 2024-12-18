@@ -5,20 +5,21 @@ class CustomHeader extends HTMLElement {
   connectedCallback() {
     const isAuthenticated = AuthService.isAuthenticated();
     const user = isAuthenticated ? JSON.parse(localStorage.getItem('user')) : null;
+    const isAdminPage = window.location.hash.startsWith('#/admin');
 
     this.innerHTML = `
-      <!-- Header -->
       <header id="mainHeader" class="bg-primary-800 fixed w-full top-0 z-50 shadow-md">
         <div class="container mx-auto px-4">
           <nav class="flex items-center justify-between h-16">
-            <!-- Left Side -->
-            <div class="flex items-center space-x-8">
-              <!-- Toggle Sidebar Button (Only visible on admin pages) -->
-              <button id="toggleSidebarBtn" 
-                      class="hidden text-white hover:text-primary-200 md:hidden px-2 py-1 rounded-lg transition-colors focus:outline-none" 
-                      aria-label="Toggle Sidebar">
-                <i class="fas fa-bars text-xl"></i>
-              </button>
+            <!-- Left Side: Logo and Basic Nav -->
+            <div class="flex items-center space-x-4">
+              ${isAuthenticated && user?.role === 'admin' && isAdminPage ? `
+                <!-- Toggle Button for Admin Sidebar -->
+                <button id="toggleSidebar" class="text-white hover:text-primary-200 transition-colors">
+                  <i class="fas fa-bars text-xl"></i>
+                </button>
+              ` : ''}
+              
               <!-- Logo -->
               <a href="#/" class="text-xl font-bold text-white flex items-center">
                 <i class="fas fa-recycle mr-2"></i>
@@ -132,6 +133,29 @@ class CustomHeader extends HTMLElement {
     `;
 
     this._initializeMenus();
+    if (isAdminPage) {
+      this._initializeSidebarToggle();
+    }
+  }
+
+  _initializeSidebarToggle() {
+    const toggleBtn = document.getElementById('toggleSidebar');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const adminSidebar = document.querySelector('.admin-sidebar');
+        const mainContent = document.querySelector('.admin-content');
+
+        if (adminSidebar && mainContent) {
+          adminSidebar.classList.toggle('hidden');
+          mainContent.classList.toggle('ml-0');
+          mainContent.classList.toggle('ml-64');
+
+          // Store sidebar state
+          const isOpen = !adminSidebar.classList.contains('hidden');
+          localStorage.setItem('adminSidebarOpen', isOpen);
+        }
+      });
+    }
   }
 
   _initializeMenus() {
@@ -162,6 +186,9 @@ class CustomHeader extends HTMLElement {
 
     // Toggle Sidebar Button for Admin Panel
     const toggleSidebarBtn = this.querySelector('#toggleSidebarBtn');
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.remove();
+    }
 
     if (toggleSidebarBtn) {
     // Show/hide toggle button based on current page
