@@ -58,7 +58,7 @@ const Home = {
               <p class="text-gray-600">Sampah didaur ulang</p>
             </div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-primary-600 mb-2">48%</div>
+              <div class="text-3xl font-bold text-primary-600 mb-2">72%</div>
               <p class="text-gray-600">Sampah berakhir di TPA</p>
             </div>
             <div class="text-center">
