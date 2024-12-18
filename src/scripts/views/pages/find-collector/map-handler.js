@@ -196,7 +196,11 @@ const MapHandler = {
         <p>Kategori: ${seller.category || '-'}</p>
         <p>Stok: ${seller.stock?.amount || 0} ${seller.stock?.unit || 'kg'}</p>
         <p>Harga: Rp ${seller.price?.amount?.toLocaleString() || 0}/${seller.stock?.unit || 'kg'}</p>
-        <div class="mt-2">
+        <div class="mt-2 flex space-x-2">
+          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${seller.location.coordinates[1]},${seller.location.coordinates[0]}')"
+                  class="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+            <i class="fas fa-map-marker-alt"></i> Rute
+          </button>
           <button onclick="window.location.hash='#/product/${seller._id}'"
                   class="bg-primary-600 text-white px-2 py-1 rounded text-sm">
             Detail
@@ -214,6 +218,10 @@ const MapHandler = {
         <p class="text-sm mb-1">Harga: Rp ${buyer.price?.amount?.toLocaleString() || 0}/${buyer.amount?.unit || 'kg'}</p>
         <p class="text-sm mb-2">${buyer.description || ''}</p>
         <div class="mt-2 flex space-x-2">
+          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${buyer.location.coordinates[1]},${buyer.location.coordinates[0]}')"
+                  class="bg-blue-500 text-white px-2 py-1 rounded text-sm">
+            <i class="fas fa-map-marker-alt"></i> Rute
+          </button>
           <button onclick="window.open('https://wa.me/${buyer.buyer?.phone?.replace(/\D/g, '')}')"
                   class="bg-green-500 text-white px-2 py-1 rounded text-sm">
             <i class="fab fa-whatsapp"></i> WA

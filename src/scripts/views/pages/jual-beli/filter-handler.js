@@ -17,7 +17,7 @@ const FilterHandler = {
   },
 
   _initializeRealTimeFilter() {
-    const inputs = ['searchInput', 'categoryFilter', 'locationFilter', 'priceMin', 'priceMax'];
+    const inputs = ['searchInput', 'categoryFilter', 'priceMin', 'priceMax'];
     inputs.forEach((id) => {
       const element = document.getElementById(id);
       if (element) {
@@ -30,7 +30,6 @@ const FilterHandler = {
     const filters = {
       search: document.getElementById('searchInput')?.value.toLowerCase() || '',
       category: document.getElementById('categoryFilter')?.value || '',
-      location: document.getElementById('locationFilter')?.value.toLowerCase() || '',
       priceMin: parseFloat(document.getElementById('priceMin')?.value) || 0,
       priceMax: parseFloat(document.getElementById('priceMax')?.value) || Infinity
     };
@@ -44,14 +43,10 @@ const FilterHandler = {
                            product.description.toLowerCase().includes(filters.search);
 
     const matchesCategory = !filters.category || product.category === filters.category;
-
-    const matchesLocation = !filters.location ||
-                             product.location.address.toLowerCase().includes(filters.location);
-
     const matchesPrice = product.price >= filters.priceMin &&
                           (filters.priceMax === Infinity || product.price <= filters.priceMax);
 
-    return matchesSearch && matchesCategory && matchesLocation && matchesPrice;
+    return matchesSearch && matchesCategory && matchesPrice;
   },
 
   // Check URL for initial filters

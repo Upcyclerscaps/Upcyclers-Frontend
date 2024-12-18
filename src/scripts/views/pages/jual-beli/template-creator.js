@@ -3,68 +3,61 @@
 const TemplateCreator = {
   createFilters() {
     return `
-          <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <form id="filterForm" class="space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Cari Produk</label>
-                  <input
-                    type="text"
-                    placeholder="Cari barang rongsok..."
-                    class="w-full p-2 border rounded-lg"
-                    id="searchInput"
-                  >
-                </div>
-    
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-                  <select id="categoryFilter" class="w-full p-2 border rounded-lg">
-                    <option value="">Semua Kategori</option>
-                    <option value="Logam">Logam</option>
-                    <option value="Plastik">Plastik</option>
-                    <option value="Kertas">Kertas</option>
-                    <option value="Elektronik">Elektronik</option>
-                  </select>
-                </div>
-    
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
-                  <select id="locationFilter" class="w-full p-2 border rounded-lg">
-                    <option value="">Semua Lokasi</option>
-                  </select>
-                </div>
-              </div>
-    
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex space-x-4">
-                  <div class="w-1/2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Harga Minimum</label>
-                    <input
-                      type="number"
-                      placeholder="Harga Min"
-                      class="w-full p-2 border rounded-lg"
-                      id="priceMin"
-                    >
-                  </div>
-                  <div class="w-1/2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Harga Maksimum</label>
-                    <input
-                      type="number"
-                      placeholder="Harga Max"
-                      class="w-full p-2 border rounded-lg"
-                      id="priceMax"
-                    >
-                  </div>
-                </div>
-                <div class="flex items-end">
-                  <button type="submit" class="w-full bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-all">
-                    <i class="fas fa-search mr-2"></i>Cari
-                  </button>
-                </div>
-              </div>
-            </form>
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <form id="filterForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Cari Produk</label>
+              <input
+                type="text"
+                placeholder="Cari barang rongsok..."
+                class="w-full p-2 border rounded-lg"
+                id="searchInput"
+              >
+            </div>
+  
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+              <select id="categoryFilter" class="w-full p-2 border rounded-lg">
+                <option value="">Semua Kategori</option>
+                <option value="Logam">Logam</option>
+                <option value="Plastik">Plastik</option>
+                <option value="Kertas">Kertas</option>
+                <option value="Elektronik">Elektronik</option>
+              </select>
+            </div>
           </div>
-        `;
+  
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex space-x-4">
+              <div class="w-1/2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Harga Minimum</label>
+                <input
+                  type="number"
+                  placeholder="Harga Min"
+                  class="w-full p-2 border rounded-lg"
+                  id="priceMin"
+                >
+              </div>
+              <div class="w-1/2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Harga Maksimum</label>
+                <input
+                  type="number"
+                  placeholder="Harga Max"
+                  class="w-full p-2 border rounded-lg"
+                  id="priceMax"
+                >
+              </div>
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-all">
+                <i class="fas fa-search mr-2"></i>Cari
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    `;
   },
 
   createProductCard(product) {
