@@ -1,5 +1,4 @@
 /* eslint-disable linebreak-style */
-// src/scripts/views/pages/admin/dashboard.js
 import AdminLayout from './components/admin-layout';
 import API_ENDPOINT from '../../../globals/api-endpoint';
 
@@ -46,19 +45,6 @@ const AdminDashboard = {
                 </div>
               </div>
             </div>
-  
-            <div class="bg-white rounded-lg shadow-md p-4 md:p-6 hover:shadow-lg transition-all w-full">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 p-3 rounded-full bg-yellow-100">
-                  <i class="fas fa-handshake text-xl text-yellow-600"></i>
-                </div>
-                <div class="ml-4 flex-grow">
-                  <p class="text-sm text-gray-500">Total Transactions</p>
-                  <h3 class="text-xl md:text-2xl font-bold" id="totalTransactions">0</h3>
-                </div>
-              </div>
-            </div>
-          </div>
   
           <!-- Latest Activities Section -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mx-auto max-w-full">
@@ -121,7 +107,6 @@ const AdminDashboard = {
     document.getElementById('totalUsers').textContent = stats.usersCount?.toLocaleString() || 0;
     document.getElementById('totalProducts').textContent = stats.productsCount?.toLocaleString() || 0;
     document.getElementById('totalBuyOffers').textContent = stats.buyOffersCount?.toLocaleString() || 0;
-    document.getElementById('totalTransactions').textContent = stats.transactionsCount?.toLocaleString() || 0;
   },
 
   _renderLatestProducts(products = []) {
