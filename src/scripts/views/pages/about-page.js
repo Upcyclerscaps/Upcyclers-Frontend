@@ -55,10 +55,10 @@ const About = {
                 <p class="text-primary-600 mb-2">Front-End Developer</p>
                 <p class="text-gray-500 text-sm mb-4">F0097YB69</p>
                 <div class="flex justify-center space-x-3">
-                  <a href="#" class="text-gray-400 hover:text-primary-600">
+                  <a href="https://github.com/zaidrvnd" class="text-gray-400 hover:text-primary-600">
                     <i class="fab fa-github text-xl"></i>
                   </a>
-                  <a href="#" class="text-gray-400 hover:text-primary-600">
+                  <a href="https://www.linkedin.com/in/zaidanr19/" class="text-gray-400 hover:text-primary-600">
                     <i class="fab fa-linkedin text-xl"></i>
                   </a>
                 </div>
@@ -75,10 +75,10 @@ const About = {
                 <p class="text-primary-600 mb-2">Back-End Developer</p>
                 <p class="text-gray-500 text-sm mb-4">F0097YB63</p>
                 <div class="flex justify-center space-x-3">
-                  <a href="#" class="text-gray-400 hover:text-primary-600">
+                  <a href="https://github.com/rlexs" class="text-gray-400 hover:text-primary-600">
                     <i class="fab fa-github text-xl"></i>
                   </a>
-                  <a href="#" class="text-gray-400 hover:text-primary-600">
+                  <a href="https://www.linkedin.com/in/shahril-wahyu-nugroho-9488b5285/" class="text-gray-400 hover:text-primary-600">
                     <i class="fab fa-linkedin text-xl"></i>
                   </a>
                 </div>
@@ -115,10 +115,10 @@ const About = {
                 <p class="text-primary-600 mb-2">Front-End Developer</p>
                 <p class="text-gray-500 text-sm mb-4">F1567YB21</p>
                 <div class="flex justify-center space-x-3">
-                  <a href="#" class="text-gray-400 hover:text-primary-600">
+                  <a href="https://github.com/dims572" class="text-gray-400 hover:text-primary-600">
                     <i class="fab fa-github text-xl"></i>
                   </a>
-                  <a href="#" class="text-gray-400 hover:text-primary-600">
+                  <a href="https://www.linkedin.com/in/dimas-julian/" class="text-gray-400 hover:text-primary-600">
                     <i class="fab fa-linkedin text-xl"></i>
                   </a>
                 </div>
