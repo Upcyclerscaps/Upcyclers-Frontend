@@ -2,7 +2,6 @@
 /* eslint-disable camelcase */
 
 import API_ENDPOINT from '../../../globals/api-endpoint';
-
 import MapHandler from './map-handler';
 import TemplateCreator from './template-creator';
 
@@ -25,25 +24,114 @@ const StepsHandler = {
           await this._handleSubmit(e);
         }
       });
+
+      // Add realtime validation
+      const inputs = form.querySelectorAll('input:not([type="hidden"]), textarea, select');
+      inputs.forEach((input) => {
+        input.addEventListener('input', () => this._validateField(input));
+        input.addEventListener('blur', () => this._validateField(input));
+      });
     }
+  },
+
+  _validateField(input) {
+    const errorId = `${input.name}-error`;
+    let errorElement = document.getElementById(errorId);
+
+    // Create error element if doesn't exist
+    if (!errorElement) {
+      errorElement = document.createElement('span');
+      errorElement.id = errorId;
+      errorElement.className = 'text-red-500 text-sm mt-1 hidden';
+      input.parentNode.appendChild(errorElement);
+    }
+
+    // Reset styling
+    input.classList.remove('border-red-500');
+    errorElement.classList.add('hidden');
+
+    let isValid = true;
+    let errorMessage = '';
+
+    // Required validation
+    if (input.hasAttribute('required') && !input.value.trim()) {
+      isValid = false;
+      errorMessage = 'Field ini wajib diisi';
+    }
+    // Specific validations
+    else {
+      switch (input.name) {
+      case 'nama_barang':
+        if (input.value.length < 3) {
+          isValid = false;
+          errorMessage = 'Nama barang minimal 3 karakter';
+        }
+        break;
+      case 'harga':
+        if (isNaN(input.value) || Number(input.value) <= 0) {
+          isValid = false;
+          errorMessage = 'Harga harus berupa angka positif';
+        }
+        break;
+      case 'jumlah':
+        if (isNaN(input.value) || Number(input.value) <= 0) {
+          isValid = false;
+          errorMessage = 'Jumlah harus berupa angka positif';
+        }
+        break;
+      case 'deskripsi':
+        if (input.value.length < 10) {
+          isValid = false;
+          errorMessage = 'Deskripsi minimal 10 karakter';
+        }
+        break;
+      case 'alamat':
+        if (input.value.length < 10) {
+          isValid = false;
+          errorMessage = 'Alamat minimal 10 karakter';
+        }
+        break;
+      }
+    }
+
+    // Show error if invalid
+    if (!isValid) {
+      input.classList.add('border-red-500');
+      errorElement.textContent = errorMessage;
+      errorElement.classList.remove('hidden');
+    }
+
+    return isValid;
   },
 
   async _handleSubmit(form) {
     try {
-      const nextButton = document.getElementById('nextButton');
-      nextButton.disabled = true;
-      nextButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+      this._showLoading(true);
+      this._clearErrors();
 
-      // Ambil data user dari localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
+      // Validate current step
+      if (!this._validateCurrentStep()) {
+        this._showError('Harap lengkapi semua field yang diperlukan');
+        return;
+      }
 
-      // Upload image ke Cloudinary
+      // Upload image
       const imageFile = document.querySelector('#mainImageInput').files[0];
       if (!imageFile) {
         throw new Error('Silakan pilih foto produk');
       }
 
-      let imageUrl = '';
+      // Get coordinates
+      const user = JSON.parse(localStorage.getItem('user'));
+      const formData = new FormData(form);
+      const latitude = document.getElementById('latitude').value || user?.latitude;
+      const longitude = document.getElementById('longitude').value || user?.longitude;
+
+      if (!latitude || !longitude) {
+        throw new Error('Lokasi belum dipilih. Silakan pilih lokasi di peta.');
+      }
+
+      // Upload image to cloudinary
       const imageFormData = new FormData();
       imageFormData.append('image', imageFile);
 
@@ -57,16 +145,7 @@ const StepsHandler = {
 
       if (!uploadResponse.ok) throw new Error('Gagal mengupload gambar');
       const uploadResult = await uploadResponse.json();
-      imageUrl = uploadResult.data.url;
-
-      // Get coordinates from form or user data
-      const formData = new FormData(form);
-      const latitude = document.getElementById('latitude').value || user?.latitude;
-      const longitude = document.getElementById('longitude').value || user?.longitude;
-
-      if (!latitude || !longitude) {
-        throw new Error('Lokasi belum dipilih. Silakan pilih lokasi di peta.');
-      }
+      const imageUrl = uploadResult.data.url;
 
       // Prepare product data
       const productData = {
@@ -95,8 +174,6 @@ const StepsHandler = {
         }]
       };
 
-      console.log('Data to be sent:', productData); // Debug log
-
       // Send to server
       const response = await fetch(API_ENDPOINT.CREATE_PRODUCT, {
         method: 'POST',
@@ -112,17 +189,84 @@ const StepsHandler = {
         throw new Error(error.message || 'Gagal menyimpan produk');
       }
 
-      alert('Produk berhasil ditambahkan!');
-      window.location.hash = '#/profile';
+      this._showSuccess('Produk berhasil ditambahkan!');
+      setTimeout(() => {
+        window.location.hash = '#/profile';
+      }, 2000);
 
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert(error.message || 'Terjadi kesalahan saat menyimpan produk');
+      this._showError(error.message || 'Terjadi kesalahan saat menyimpan produk');
     } finally {
-      const nextButton = document.getElementById('nextButton');
-      nextButton.disabled = false;
-      nextButton.textContent = 'Kirim';
+      this._showLoading(false);
     }
+  },
+
+  _showLoading(isLoading) {
+    const nextButton = document.getElementById('nextButton');
+    if (nextButton) {
+      nextButton.disabled = isLoading;
+      nextButton.innerHTML = isLoading ?
+        '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...' :
+        (this.currentStep === this.totalSteps ? 'Kirim' : 'Selanjutnya');
+    }
+  },
+
+  _showError(message) {
+    const alert = this._createAlert(message, 'error');
+    document.body.appendChild(alert);
+  },
+
+  _showSuccess(message) {
+    const alert = this._createAlert(message, 'success');
+    document.body.appendChild(alert);
+  },
+
+  _createAlert(message, type) {
+    const alert = document.createElement('div');
+    alert.className = `fixed top-4 left-1/2 transform -translate-x-1/2 
+     px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 z-50
+     ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white`;
+
+    alert.innerHTML = `
+     <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
+     <span>${message}</span>
+     <button class="ml-4 hover:text-${type === 'error' ? 'red' : 'green'}-200">
+       <i class="fas fa-times"></i>
+     </button>
+   `;
+
+    // Add close handler
+    alert.querySelector('button').addEventListener('click', () => alert.remove());
+
+    // Auto remove
+    setTimeout(() => alert.remove(), 5000);
+
+    return alert;
+  },
+
+  _clearErrors() {
+    const errorElements = document.querySelectorAll('.text-red-500');
+    errorElements.forEach((el) => el.classList.add('hidden'));
+
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach((input) => input.classList.remove('border-red-500'));
+  },
+
+  _validateCurrentStep() {
+    const currentStepEl = document.getElementById(`step${this.currentStep}`);
+    if (!currentStepEl) return true;
+
+    const inputs = currentStepEl.querySelectorAll('input:not([type="hidden"]), textarea, select');
+    let isValid = true;
+
+    inputs.forEach((input) => {
+      if (!this._validateField(input)) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
   },
 
   _initializeButtons() {
@@ -131,15 +275,19 @@ const StepsHandler = {
 
     if (nextButton) {
       nextButton.addEventListener('click', async () => {
-        // Jika di step terakhir dan klik "Kirim"
         if (this.currentStep === this.totalSteps) {
           const form = document.getElementById('sellForm');
           if (form) {
             await this._handleSubmit(form);
           }
         } else if (this.currentStep < this.totalSteps) {
-          this.currentStep++;
-          this.showStep(this.currentStep);
+          // Validate current step before proceeding
+          if (this._validateCurrentStep()) {
+            this.currentStep++;
+            this.showStep(this.currentStep);
+          } else {
+            this._showError('Harap lengkapi semua field yang diperlukan');
+          }
         }
       });
     }
@@ -153,7 +301,6 @@ const StepsHandler = {
       });
     }
   },
-
 
   showStep(step) {
     // Hide all steps
@@ -205,10 +352,9 @@ const StepsHandler = {
       const form = document.getElementById('sellForm');
       const formData = new FormData(form);
 
-      // Coba ambil URL gambar dari beberapa sumber
       const imageUrl = document.getElementById('mainImagePreview')?.querySelector('img')?.src ||
-                      document.getElementById('profileImageUrl')?.value ||
-                      'https://via.placeholder.com/200';
+                     document.getElementById('profileImageUrl')?.value ||
+                     'https://via.placeholder.com/200';
 
       const summaryContainer = document.getElementById('summary-content');
       if (summaryContainer) {

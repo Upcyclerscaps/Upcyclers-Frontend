@@ -81,6 +81,14 @@ const MapHandler = {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       const data = await response.json();
+
+      // Update kota dan kode pos dari hasil reverse geocoding
+      const cityInput = document.querySelector('input[name="city"]');
+      const postalCodeInput = document.querySelector('input[name="postalCode"]');
+
+      if (cityInput) cityInput.value = data.address?.city || data.address?.town || '';
+      if (postalCodeInput) postalCodeInput.value = data.address?.postcode || '';
+
       return data.display_name;
     } catch (error) {
       console.error('Error fetching address:', error);
