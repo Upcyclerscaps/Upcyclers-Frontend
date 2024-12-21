@@ -10,9 +10,30 @@ const StepsHandler = {
   totalSteps: 3,
 
   initialize() {
+    this.resetState(); // Reset state saat inisialisasi
     this._initializeButtons();
     this._initializeForm();
     this.showStep(1);
+  },
+
+  resetState() {
+    this.currentStep = 1;
+
+    // Reset form jika ada
+    const form = document.getElementById('sellForm');
+    if (form) form.reset();
+
+    // Reset image preview
+    const imagePreview = document.getElementById('mainImagePreview');
+    if (imagePreview) imagePreview.innerHTML = '';
+
+    // Reset input fields
+    const inputs = document.querySelectorAll('input:not([type="hidden"]), textarea, select');
+    inputs.forEach((input) => {
+      input.classList.remove('border-red-500');
+      const errorSpan = document.getElementById(`${input.name}-error`);
+      if (errorSpan) errorSpan.classList.add('hidden');
+    });
   },
 
   _initializeForm() {
@@ -283,6 +304,24 @@ const StepsHandler = {
         } else if (this.currentStep < this.totalSteps) {
           // Validate current step before proceeding
           if (this._validateCurrentStep()) {
+            // Khusus untuk step 1, cek gambar
+            if (this.currentStep === 1) {
+              const imageInput = document.querySelector('#mainImageInput');
+              if (!imageInput || !imageInput.files.length) {
+                this._showError('Silakan pilih foto produk');
+                return;
+              }
+            }
+            // Khusus untuk step 2, cek lokasi
+            if (this.currentStep === 2) {
+              const latitude = document.getElementById('latitude').value;
+              const longitude = document.getElementById('longitude').value;
+              if (!latitude || !longitude) {
+                this._showError('Silakan pilih lokasi pada peta');
+                return;
+              }
+            }
+
             this.currentStep++;
             this.showStep(this.currentStep);
           } else {

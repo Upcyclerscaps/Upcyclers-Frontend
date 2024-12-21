@@ -47,13 +47,32 @@ module.exports = {
       swDest: './sw.bundle.js',
       runtimeCaching: [
         {
-          urlPattern: ({ url }) => url.href.startsWith('https://upcyclers.servehttp.com/api/v1'),
+          urlPattern: ({ url }) => {
+            return url.href.startsWith('http://localhost:5000/api/v1') || 
+                   url.href.startsWith('https://upcyclers.servehttp.com/api/v1')
+          },
           handler: 'StaleWhileRevalidate',
           options: {
-            cacheName: 'Upcyclers-api'
-          }
-        }
-      ]
+            cacheName: 'Upcyclers-api',
+          },
+        },
+      ],
     }),
   ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: Infinity,
+      minSize: 0,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `vendor.${packageName.replace('@', '')}`;
+          },
+        },
+      },
+    },
+  }
 };

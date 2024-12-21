@@ -32,6 +32,30 @@ header {
   top: 4rem; /* Push controls below header */
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#mainContent {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+footer-element {
+  flex-shrink: 0;
+  margin-top: auto;
+}
 
 @keyframes fadeIn {
   from {
@@ -161,6 +185,7 @@ footer {
 }
 
 
+
 /* Bottom Navigation Styles */
 @media (max-width: 768px) {
   /* Add padding to main content to account for bottom nav */
@@ -183,4 +208,27 @@ footer {
 /* Smooth transitions */
 .hover\:text-primary-600 {
   transition: color 0.2s ease;
+}
+
+.alert-message {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.alert-message button {
+  transition: opacity 0.2s;
+}
+
+.alert-message button:hover {
+  opacity: 0.8;
 }

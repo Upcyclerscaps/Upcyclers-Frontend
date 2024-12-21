@@ -7,7 +7,6 @@ class App {
   constructor({ content }) {
     this._content = content;
     this._header = document.querySelector('header');
-
     this._initialAppShell();
   }
 
@@ -36,7 +35,7 @@ class App {
 
   async renderPage() {
     try {
-
+      // Redirect to home if no hash
       if (window.location.pathname === '/' && !window.location.hash) {
         window.location.hash = '#/';
         return;
@@ -60,7 +59,16 @@ class App {
       // Show loading state
       this._content.innerHTML = this._getLoadingIndicator();
 
-      const page = routes[url] || routes['/404'];
+      // Get page module
+      let pageModule;
+      try {
+        pageModule = await routes[url]?.() || await routes['/404']();
+      } catch (error) {
+        console.error('Error loading page module:', error);
+        pageModule = await routes['/404']();
+      }
+
+      const page = pageModule.default;
       document.title = this._getPageTitle(url);
 
       // Handle product detail page
@@ -69,7 +77,7 @@ class App {
         const productId = urlParams.id;
 
         if (!productId) {
-          this._content.innerHTML = await routes['/404'].render();
+          this._content.innerHTML = await routes['/404']().then((m) => m.default.render());
         } else {
           this._content.innerHTML = await page.render(productId);
         }
@@ -87,7 +95,8 @@ class App {
 
     } catch (error) {
       console.error('Error rendering page:', error);
-      this._content.innerHTML = await routes['/404'].render();
+      const notFoundModule = await routes['/404']();
+      this._content.innerHTML = await notFoundModule.default.render();
     }
   }
 
@@ -98,7 +107,14 @@ class App {
       '/find-collector': 'Temukan Pengepul - Upcyclers',
       '/about': 'Tentang Kami - Upcyclers',
       '/auth': 'Masuk/Daftar - Upcyclers',
+      '/profile': 'Profil - Upcyclers',
+      '/edit-profile': 'Edit Profil - Upcyclers',
       '/product': 'Detail Produk - Upcyclers',
+      '/buy-offers': 'Penawaran - Upcyclers',
+      '/admin': 'Admin Dashboard - Upcyclers',
+      '/admin/users': 'Kelola Users - Upcyclers',
+      '/admin/products': 'Kelola Produk - Upcyclers',
+      '/admin/buy-offers': 'Kelola Penawaran - Upcyclers',
       '/404': 'Halaman Tidak Ditemukan - Upcyclers',
     };
 

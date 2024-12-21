@@ -1,6 +1,7 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable camelcase */
 import API_ENDPOINT from '../../../globals/api-endpoint';
+import AlertHelper from '../../../utils/alert-helper';
 
 const EditSellItemPage = {
   async render() {
@@ -227,12 +228,14 @@ const EditSellItemPage = {
         throw new Error(error.message || 'Gagal mengupdate produk');
       }
 
-      alert('Produk berhasil diupdate!');
-      window.location.hash = '#/profile';
+      AlertHelper.showAlert('Produk berhasil diperbarui', 'success');
+      setTimeout(() => {
+        window.location.hash = '#/profile';
+      }, 2000);
 
     } catch (error) {
-      console.error('Error:', error);
-      alert(error.message || 'Terjadi kesalahan saat mengupdate produk');
+      console.error('Error updating product:', error);
+      AlertHelper.showAlert(error.message || 'Terjadi kesalahan saat mengupdate produk', 'error');
     } finally {
       const submitButton = event.target.querySelector('button[type="submit"]');
       submitButton.disabled = false;

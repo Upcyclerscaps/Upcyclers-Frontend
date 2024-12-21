@@ -317,9 +317,15 @@ const AdminUsers = {
   },
 
   async _handleDelete(userId) {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Are you sure you want to delete this user? This will also delete all their products and buy offers.')) return;
 
     try {
+      const button = document.querySelector(`button[data-user-id="${userId}"][data-action="delete"]`);
+      if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      }
+
       const response = await fetch(API_ENDPOINT.ADMIN.DELETE_USER(userId), {
         method: 'DELETE',
         headers: {
@@ -327,16 +333,42 @@ const AdminUsers = {
         }
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to delete user');
+        throw new Error(data.message || 'Failed to delete user');
       }
 
+      // Refresh user list
       await this._loadUsers();
-      this._showToast('User deleted successfully');
+      this._showSuccess('User and all associated data deleted successfully');
+
     } catch (error) {
       console.error('Error deleting user:', error);
-      this._showToast('Failed to delete user', 'error');
+      this._showError(error.message);
+    } finally {
+      const button = document.querySelector(`button[data-user-id="${userId}"][data-action="delete"]`);
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-trash"></i>';
+      }
     }
+  },
+
+  _showError(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg z-50';
+    alertDiv.textContent = message;
+    document.body.appendChild(alertDiv);
+    setTimeout(() => alertDiv.remove(), 3000);
+  },
+
+  _showSuccess(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg z-50';
+    alertDiv.textContent = message;
+    document.body.appendChild(alertDiv);
+    setTimeout(() => alertDiv.remove(), 3000);
   },
 
   async _handleEdit(userId) {

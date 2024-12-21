@@ -9,79 +9,137 @@ const Auth = {
       return '';
     }
 
+    // Prefetch edit-profile route saat halaman auth dimuat
+    if ('IntersectionObserver' in window) {
+      import('../pages/edit-profile-page');
+    }
+
     return `
-    <div class="pt-24 min-h-screen bg-gradient-to-br from-primary-500 to-primary-700">
-      <div class="container mx-auto px-4 py-8">
-        <div class="max-w-md mx-auto">
-          <div class="flex mb-6 bg-white rounded-lg shadow-md overflow-hidden">
-            <button id="loginTab" class="flex-1 py-3 text-center font-semibold transition-all">Masuk</button>
-            <button id="registerTab" class="flex-1 py-3 text-center font-semibold transition-all">Daftar</button>
+      <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div class="sm:mx-auto sm:w-full sm:max-w-md">
+          <div class="text-center">
+            <h2 class="text-3xl font-extrabold text-gray-900">
+              Selamat datang di Upcyclers
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+              Platform jual beli barang bekas terpercaya
+            </p>
           </div>
-          
-          <div id="loginForm" class="auth-card rounded-lg shadow-xl p-8 bg-white">
-            ${this._loginForm()}
+        </div>
+  
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div class="bg-white py-8 px-4 shadow-xl sm:rounded-lg sm:px-10">
+            <!-- Tab Buttons -->
+            <div class="flex bg-gray-100 p-1 rounded-lg mb-6">
+              <button id="loginTab" 
+                class="flex-1 py-2 text-center font-medium rounded-md transition-all">
+                Masuk
+              </button>
+              <button id="registerTab"
+                class="flex-1 py-2 text-center font-medium rounded-md transition-all">
+                Daftar
+              </button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-card">
+              ${this._loginForm()}
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-card hidden">
+              ${this._registerForm()}
+            </div>
           </div>
-          
-          <div id="registerForm" class="auth-card rounded-lg shadow-xl p-8 bg-white hidden">
-            ${this._registerForm()}
+  
+          <!-- Footer -->
+          <div class="mt-6 text-center text-sm">
+            <p class="text-gray-600">
+              Dengan mendaftar, Anda menyetujui syarat dan ketentuan kami
+            </p>
           </div>
         </div>
       </div>
-    </div>
-  `;
+    `;
   },
 
   _loginForm() {
     return `
-    <form class="space-y-4" novalidate>
-      <div>
-        <label class="block text-gray-700 mb-2">Email</label>
-        <input type="email" name="email" required
-          class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500">
-        <span class="text-red-500 text-sm hidden" data-error="email"></span>
-      </div>
-      <div>
-        <label class="block text-gray-700 mb-2">Password</label>
-        <input type="password" name="password" required minlength="8"
-          class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500">
-        <span class="text-red-500 text-sm hidden" data-error="password"></span>
-      </div>
-      <button type="submit" 
-        class="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition-all">
-        Masuk
-      </button>
-    </form>
-  `;
+      <form class="space-y-6" novalidate>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <div class="mt-1 relative">
+            <input type="email" name="email" required
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md 
+              focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+            <span class="text-red-500 text-xs mt-1 hidden" data-error="email"></span>
+          </div>
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Password</label>
+          <div class="mt-1 relative">
+            <input type="password" name="password" required minlength="8"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
+              focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+            <span class="text-red-500 text-xs mt-1 hidden" data-error="password"></span>
+          </div>
+        </div>
+  
+        <button type="submit" 
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md 
+          shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
+          disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          Masuk
+        </button>
+      </form>
+    `;
   },
 
   _registerForm() {
     return `
-    <form class="space-y-4" novalidate>
-      <div>
-        <label class="block text-gray-700 mb-2">Nama Lengkap</label>
-        <input type="text" name="name" required minlength="3"
-          class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500">
-        <span class="text-red-500 text-sm hidden" data-error="name"></span>
-      </div>
-      <div>
-        <label class="block text-gray-700 mb-2">Email</label>
-        <input type="email" name="email" required
-          class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500">
-        <span class="text-red-500 text-sm hidden" data-error="email"></span>
-      </div>
-      <div>
-        <label class="block text-gray-700 mb-2">Password</label>
-        <input type="password" name="password" required minlength="8"
-          class="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500">
-        <span class="text-red-500 text-sm hidden" data-error="password"></span>
-        <p class="text-gray-500 text-sm mt-1">Minimal 8 karakter</p>
-      </div>
-      <button type="submit"
-        class="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition-all">
-        Daftar
-      </button>
-    </form>
-  `;
+      <form class="space-y-6" novalidate>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+          <div class="mt-1 relative">
+            <input type="text" name="name" required minlength="3"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
+              focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+            <span class="text-red-500 text-xs mt-1 hidden" data-error="name"></span>
+          </div>
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <div class="mt-1 relative">
+            <input type="email" name="email" required
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
+              focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+            <span class="text-red-500 text-xs mt-1 hidden" data-error="email"></span>
+          </div>
+        </div>
+  
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Password</label>
+          <div class="mt-1 relative">
+            <input type="password" name="password" required minlength="8"
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
+              focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+            <span class="text-red-500 text-xs mt-1 hidden" data-error="password"></span>
+            <p class="mt-1 text-xs text-gray-500">Minimal 8 karakter</p>
+          </div>
+        </div>
+  
+        <button type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md
+          shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
+          disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+          Daftar
+        </button>
+      </form>
+    `;
   },
 
   _initializeRealTimeValidation(form) {
@@ -180,8 +238,67 @@ const Auth = {
       const responseJson = await response.json();
 
       if (!response.ok) {
+        // Handle email not registered
+        if (response.status === 404 || responseJson.message.toLowerCase().includes('tidak ditemukan')) {
+          // Clear all previous errors
+          form.querySelectorAll('[data-error]').forEach((span) => {
+            span.textContent = '';
+            span.classList.add('hidden');
+          });
+          form.querySelectorAll('input').forEach((input) => {
+            input.classList.remove('border-red-500');
+          });
+
+          // Show error for email field
+          const emailInput = form.querySelector('[name="email"]');
+          const emailError = form.querySelector('[data-error="email"]');
+          emailInput.classList.add('border-red-500');
+          emailError.classList.remove('hidden');
+
+          // Create error message with register button
+          emailError.innerHTML = `
+            <div class="flex items-center gap-1">
+              <span>Email belum terdaftar.</span>
+              <button type="button" 
+                class="text-primary-600 hover:text-primary-700 underline font-medium"
+                id="registerNowBtn">
+                Daftar sekarang
+              </button>
+            </div>
+          `;
+
+          // Add click handler for register button
+          document.getElementById('registerNowBtn').addEventListener('click', () => {
+            // Switch to register tab
+            document.getElementById('registerTab').click();
+
+            // Auto fill email in register form
+            const registerForm = document.querySelector('#registerForm form');
+            const registerEmail = registerForm.querySelector('[name="email"]');
+            if (registerEmail) {
+              registerEmail.value = loginData.email;
+              // Validate the email field in register form
+              this._validateField(registerEmail, registerForm);
+            }
+          });
+
+          throw new Error('Email belum terdaftar');
+        }
+
+        // Handle wrong password
+        if (response.status === 401) {
+          this._showFieldError(form, 'password', 'Password salah. Silakan coba lagi');
+          throw new Error('Password salah');
+        }
+
         throw new Error(responseJson.message || 'Login gagal');
       }
+
+      // Show success message
+      this._showAlert('Login berhasil!', 'success');
+
+      // Wait for animation
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       localStorage.setItem('token', responseJson.token);
       localStorage.setItem('user', JSON.stringify(responseJson.data.user));
@@ -190,8 +307,11 @@ const Auth = {
       window.location.reload();
     } catch (error) {
       console.error('Login error:', error);
-      this._showAlert(error.message, 'error');
-
+      if (!error.message.includes('Password salah') &&
+          !error.message.includes('Email belum terdaftar')) {
+        this._showAlert(error.message, 'error');
+      }
+    } finally {
       const button = form.querySelector('button[type="submit"]');
       button.disabled = false;
       button.textContent = 'Masuk';
@@ -250,43 +370,58 @@ const Auth = {
         throw new Error(responseJson.message || 'Registrasi gagal');
       }
 
-      // Tampilkan pesan sukses
+      // Pre-load edit-profile sebelum redirect
+      await import('../pages/edit-profile-page');
+
+      // Show success message with proper timing and position
       this._showAlert('Registrasi berhasil, sedang login...', 'success');
 
-      // Auto login
-      const loginResponse = await fetch(API_ENDPOINT.LOGIN, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: registerData.email,
-          password: registerData.password,
-        }),
-      });
+      // Add delay before auto login
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      const loginJson = await loginResponse.json();
+      // Proceed with auto login
+      try {
+        const loginResponse = await fetch(API_ENDPOINT.LOGIN, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: registerData.email,
+            password: registerData.password,
+          }),
+        });
 
-      if (!loginResponse.ok) {
-        throw new Error(loginJson.message || 'Login otomatis gagal');
-      }
+        const loginJson = await loginResponse.json();
 
-      localStorage.setItem('token', loginJson.token);
-      localStorage.setItem('user', JSON.stringify(loginJson.data.user));
-      localStorage.setItem('showWelcomeMessage', 'true');
+        if (!loginResponse.ok) {
+          throw new Error(loginJson.message || 'Login otomatis gagal');
+        }
 
-      // Delay redirect
-      setTimeout(() => {
+        localStorage.setItem('token', loginJson.token);
+        localStorage.setItem('user', JSON.stringify(loginJson.data.user));
+        localStorage.setItem('showWelcomeMessage', 'true');
+
+        // Tambahkan loading state sebelum redirect
+        const mainContent = document.querySelector('#mainContent');
+        mainContent.innerHTML = `
+          <div class="flex justify-center items-center min-h-screen">
+            <div class="text-center">
+              <i class="fas fa-spinner fa-spin text-4xl text-primary-600"></i>
+              <p class="mt-2 text-gray-600">Menyiapkan profil Anda...</p>
+            </div>
+          </div>
+        `;
+
+        // Add delay before redirect
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         window.location.hash = '#/edit-profile';
         window.location.reload();
-      }, 1500);
 
-    } catch (error) {
-      console.error('Register error:', error);
-
-      // Tampilkan error dengan _showAlert jika bukan error email duplikat
-      if (!error.message.includes('Email sudah terdaftar')) {
-        this._showAlert(error.message, 'error');
+      } catch (error) {
+        console.error('Auto login error:', error);
+        this._showAlert('Registrasi berhasil, silakan login manual', 'success');
       }
 
     } finally {
@@ -313,16 +448,34 @@ const Auth = {
     existingAlerts.forEach((alert) => alert.remove());
 
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert-message fixed top-4 left-1/2 transform -translate-x-1/2 
-     px-6 py-3 rounded-lg text-white ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}
-     transition-all duration-300 ease-in-out opacity-0`;
-    alertDiv.textContent = message;
+    alertDiv.className = `alert-message fixed top-20 left-1/2 transform -translate-x-1/2  
+      px-6 py-3 rounded-lg text-white ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}
+      transition-all duration-300 ease-in-out opacity-0 z-50`; // Tambahkan z-50
+
+    alertDiv.innerHTML = `
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
+        <span>${message}</span>
+        <button class="ml-4 hover:text-${type === 'error' ? 'red' : 'green'}-200">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
 
     document.body.appendChild(alertDiv);
 
-    // Trigger animation
-    setTimeout(() => alertDiv.classList.add('opacity-100'), 100);
+    // Add close handler
+    alertDiv.querySelector('button').addEventListener('click', () => {
+      alertDiv.classList.remove('opacity-100');
+      setTimeout(() => alertDiv.remove(), 300);
+    });
 
+    // Trigger animation
+    requestAnimationFrame(() => {
+      alertDiv.classList.add('opacity-100');
+    });
+
+    // Auto remove after 3 seconds
     setTimeout(() => {
       alertDiv.classList.remove('opacity-100');
       setTimeout(() => alertDiv.remove(), 300);

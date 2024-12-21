@@ -98,19 +98,158 @@ const Profile = {
   },
 
   _initializeEventListeners() {
-    // Delegasi event untuk tombol delete
-    document.addEventListener('click', async (e) => {
+    // Hapus event listener lama untuk mencegah duplikasi
+    const contentContainer = document.getElementById('tabContent');
+    contentContainer.addEventListener('click', async (e) => {
       const deleteBtn = e.target.closest('[data-delete-id]');
       if (deleteBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+
         const id = deleteBtn.dataset.deleteId;
         const type = deleteBtn.dataset.type;
+        const itemName = deleteBtn.closest('.border').querySelector('h3').textContent;
 
-        // Konfirmasi hanya sekali di sini
-        if (confirm(`Hapus ${type === 'selling' ? 'barang' : 'penawaran'} ini?`)) {
+        // Show custom confirmation dialog
+        const confirmed = await this._showConfirmDialog({
+          title: `Hapus ${type === 'selling' ? 'Barang' : 'Penawaran'}`,
+          message: `Apakah Anda yakin ingin menghapus ${type === 'selling' ? 'barang' : 'penawaran'} "${itemName}"?`,
+          confirmText: 'Hapus',
+          cancelText: 'Batal'
+        });
+
+        if (confirmed) {
           await this._deleteItem(id, type);
         }
       }
     });
+  },
+
+  _showConfirmDialog({ title, message, confirmText = 'Ya', cancelText = 'Batal' }) {
+    return new Promise((resolve) => {
+      // Create modal backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className =
+        'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+
+      // Create modal content
+      const modal = document.createElement('div');
+      modal.className =
+        'bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all';
+      modal.innerHTML = `
+        <div class="p-6">
+          <h3 class="text-lg font-semibold mb-2">${title}</h3>
+          <p class="text-gray-600 mb-6">${message}</p>
+          <div class="flex justify-end space-x-3">
+            <button id="cancelBtn" 
+              class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors">
+              ${cancelText}
+            </button>
+            <button id="confirmBtn" 
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+              ${confirmText}
+            </button>
+          </div>
+        </div>
+      `;
+
+      backdrop.appendChild(modal);
+      document.body.appendChild(backdrop);
+
+      // Add button handlers
+      modal.querySelector('#confirmBtn').addEventListener('click', () => {
+        backdrop.remove();
+        resolve(true);
+      });
+
+      modal.querySelector('#cancelBtn').addEventListener('click', () => {
+        backdrop.remove();
+        resolve(false);
+      });
+
+      // Close on backdrop click
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) {
+          backdrop.remove();
+          resolve(false);
+        }
+      });
+
+      // Add animation
+      requestAnimationFrame(() => {
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        requestAnimationFrame(() => {
+          modal.style.opacity = '1';
+          modal.style.transform = 'scale(1)';
+        });
+      });
+    });
+  },
+
+  async _deleteItem(itemId, type) {
+    try {
+      const button = document.querySelector(`[data-delete-id="${itemId}"]`);
+      if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      }
+
+      const endpoint = type === 'selling'
+        ? API_ENDPOINT.DELETE_PRODUCT(itemId)
+        : `${API_ENDPOINT.BUY_OFFERS}/${itemId}`;
+
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal menghapus item');
+      }
+
+      // Show success message
+      this._showToast('Item berhasil dihapus', 'success');
+
+      // Refresh data
+      await this._loadUserData();
+      const tabContent = document.getElementById('tabContent');
+      await this._loadTabContent(type, tabContent);
+
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      this._showToast('Gagal menghapus item', 'error');
+    }
+  },
+
+  _showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `
+      fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white
+      transform transition-all duration-300 translate-y-full
+      ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}
+    `;
+
+    toast.innerHTML = `
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${message}</span>
+      </div>
+    `;
+
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+      toast.style.transform = 'translateY(100%)';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
   },
 
   _initializeTabs() {
@@ -260,38 +399,6 @@ const Profile = {
     `;
   },
 
-  async _deleteItem(itemId, type) {
-    try {
-      // Hapus konfirmasi di sini karena sudah ada di event listener
-      let endpoint = '';
-      if (type === 'selling') {
-        endpoint = `${API_ENDPOINT.DELETE_PRODUCT(itemId)}`;
-      } else {
-        endpoint = `${API_ENDPOINT.BUY_OFFERS}/${itemId}`;
-      }
-
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Gagal menghapus item');
-      }
-
-      // Refresh content setelah delete berhasil
-      await this._loadUserData(); // Refresh stats
-      const tabContent = document.getElementById('tabContent');
-      await this._loadTabContent(type, tabContent);
-
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      alert('Gagal menghapus item. Silakan coba lagi.');
-    }
-  }
 };
 
 export default Profile;

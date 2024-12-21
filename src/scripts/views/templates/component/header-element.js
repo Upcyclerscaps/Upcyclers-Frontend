@@ -2,7 +2,26 @@
 import AuthService from '../../../services/auth.service';
 
 class CustomHeader extends HTMLElement {
+  constructor() {
+    super();
+    this._boundRender = this._render.bind(this);
+    this._hashChangeHandler = this._handleHashChange.bind(this);
+  }
+
   connectedCallback() {
+    this._render();
+    window.addEventListener('hashchange', this._hashChangeHandler);
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('hashchange', this._hashChangeHandler);
+  }
+
+  _handleHashChange() {
+    this._render();
+  }
+
+  _render() {
     const isAuthenticated = AuthService.isAuthenticated();
     const user = isAuthenticated ? JSON.parse(localStorage.getItem('user')) : null;
     const isAdminPage = window.location.hash.startsWith('#/admin');
