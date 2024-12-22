@@ -24,7 +24,7 @@ const EditProfile = {
                   <div class="relative inline-block">
                     <img alt="Profile picture" class="w-32 h-32 rounded-full mx-auto mb-4 object-cover" 
                          id="previewImage"
-                         src="${user?.profileImage || 'https://via.placeholder.com/128'}" />
+                         src="${user?.profileImage || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}" />
                     <label class="absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-all">
                       <i class="fas fa-camera"></i>
                       <input type="file" class="hidden" accept="image/*" id="profileImageInput" name="profileImage"/>
@@ -269,7 +269,7 @@ const EditProfile = {
 
   _initializeImageUpload() {
     const preview = document.getElementById('previewImage');
-    const defaultImage = 'https://via.placeholder.com/128?text=Profile';
+    const defaultImage = 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008';
 
     // Set default image if src is invalid
     preview.onerror = () => {
@@ -289,7 +289,7 @@ const EditProfile = {
       }
 
       try {
-        preview.src = 'https://via.placeholder.com/128?text=Loading...';
+        preview.src = 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008';
 
         const formData = new FormData();
         formData.append('image', file);

@@ -98,7 +98,7 @@ const AdminBuyOffers = {
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center space-x-3">
             <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
-                 src="${offer.buyer?.profileImage || 'https://via.placeholder.com/40'}"
+                 src="${offer.buyer?.profileImage || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}"
                  alt="${offer.buyer?.name}">
             <div>
               <div class="text-sm font-medium text-gray-900">${offer.buyer?.name || 'Unknown'}</div>

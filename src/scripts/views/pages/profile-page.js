@@ -22,7 +22,7 @@ const Profile = {
           <!-- Profile Header -->
           <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center space-x-6">
-              <img src="${user?.profileImage || 'https://via.placeholder.com/128'}" 
+              <img src="${user?.profileImage || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}" 
                    alt="Profile picture" 
                    class="w-32 h-32 rounded-full bg-gray-200">
               
@@ -373,7 +373,7 @@ const Profile = {
       <div class="border rounded-lg p-4">
         <div class="flex items-start space-x-4">
           ${type === 'selling' ? `
-            <img src="${item.images[0]?.url || 'https://via.placeholder.com/80'}" 
+            <img src="${item.images[0]?.url || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}" 
                  alt="${item.name}"
                  class="w-20 h-20 object-cover rounded-lg">
           ` : ''}

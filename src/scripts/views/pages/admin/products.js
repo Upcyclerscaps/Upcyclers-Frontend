@@ -90,7 +90,7 @@ const AdminProducts = {
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center space-x-3">
             <img class="h-12 w-12 rounded object-cover border border-gray-200"
-                 src="${product.images?.[0]?.url || 'https://via.placeholder.com/48'}"
+                 src="${product.images?.[0]?.url || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}"
                  alt="${product.name}">
             <div>
               <div class="text-sm font-medium text-gray-900">${product.name || '-'}</div>
@@ -117,7 +117,7 @@ const AdminProducts = {
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center space-x-3">
             <img class="h-8 w-8 rounded-full object-cover"
-                 src="${product.seller?.profileImage || 'https://via.placeholder.com/32'}"
+                 src="${product.seller?.profileImage || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}"
                  alt="${product.seller?.name}">
             <div class="text-sm text-gray-900">${product.seller?.name || 'Unknown'}</div>
           </div>

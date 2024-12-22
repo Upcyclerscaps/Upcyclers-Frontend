@@ -79,7 +79,7 @@ class CustomHeader extends HTMLElement {
                 <!-- Profile Dropdown -->
                 <div class="relative">
                   <button id="userMenuBtn" class="flex items-center space-x-2 text-white">
-                    <img src="${user.profileImage || 'https://via.placeholder.com/32'}" 
+                    <img src="${user.profileImage || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}" 
                          alt="Profile" 
                          class="w-8 h-8 rounded-full object-cover border-2 border-white">
                   </button>

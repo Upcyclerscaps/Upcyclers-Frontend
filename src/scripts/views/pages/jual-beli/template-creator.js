@@ -68,7 +68,7 @@ const TemplateCreator = {
             src="${this._getProductImage(product)}" 
             alt="${product.name}"
             class="w-full h-48 object-cover rounded-t-lg"
-            onerror="this.src='https://via.placeholder.com/300x300'"
+            onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'"
           >
           <div class="p-4">
             <div class="flex justify-between items-start mb-2">
@@ -104,7 +104,7 @@ const TemplateCreator = {
       return mainImage.url;
     }
 
-    return 'https://via.placeholder.com/300x300';
+    return 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008';
   },
 
   _formatQuantity(product) {

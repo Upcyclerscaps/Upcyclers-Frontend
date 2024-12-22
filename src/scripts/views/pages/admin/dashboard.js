@@ -144,7 +144,7 @@ const AdminDashboard = {
     container.innerHTML = products.map((product) => `
      <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
        <div class="flex items-center space-x-4">
-         <img src="${product.images?.[0]?.url || 'https://via.placeholder.com/40'}"
+         <img src="${product.images?.[0]?.url || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}"
               alt="${product.name}"
               class="w-12 h-12 rounded object-cover">
          <div>
@@ -174,7 +174,7 @@ const AdminDashboard = {
     container.innerHTML = offers.map((offer) => `
      <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
        <div class="flex items-center space-x-4">
-         <img src="${offer.buyer?.profileImage || 'https://via.placeholder.com/40'}"
+         <img src="${offer.buyer?.profileImage || 'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008'}"
               alt="${offer.buyer?.name}"
               class="w-12 h-12 rounded-full object-cover">
          <div>

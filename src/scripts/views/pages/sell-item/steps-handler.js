@@ -393,7 +393,7 @@ const StepsHandler = {
 
       const imageUrl = document.getElementById('mainImagePreview')?.querySelector('img')?.src ||
                      document.getElementById('profileImageUrl')?.value ||
-                     'https://via.placeholder.com/200';
+                     'https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg?20160314221008';
 
       const summaryContainer = document.getElementById('summary-content');
       if (summaryContainer) {
