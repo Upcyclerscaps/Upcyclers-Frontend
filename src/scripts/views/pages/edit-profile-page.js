@@ -405,6 +405,33 @@ const EditProfile = {
     }
   },
 
+  _formatPhoneNumber(phone) {
+    // Hapus semua karakter non-digit
+    let cleanNumber = phone.replace(/\D/g, '');
+
+    // Jika nomor dimulai dengan 62, sudah dalam format yang benar
+    if (cleanNumber.startsWith('62')) {
+      return `+${cleanNumber}`;
+    }
+
+    // Jika nomor dimulai dengan 0, hapus 0 dan tambahkan 62
+    if (cleanNumber.startsWith('0')) {
+      cleanNumber = cleanNumber.substring(1);
+      return `+62${cleanNumber}`;
+    }
+
+    // Jika nomor dimulai dengan 8, tambahkan 62
+    if (cleanNumber.startsWith('8')) {
+      return `+62${cleanNumber}`;
+    }
+
+    // Untuk kasus lain, asumsikan sebagai nomor lokal dan tambahkan 628
+    if (/^[1-9]/.test(cleanNumber))
+    {
+      return `+628${cleanNumber}`;
+    }
+  },
+
   async _handleSubmit(event) {
     event.preventDefault();
     try {
@@ -494,7 +521,7 @@ const EditProfile = {
       // Update profile data
       const profileData = {
         name: `${formData.get('firstName')} ${formData.get('lastName')}`,
-        phone: formData.get('phone'),
+        phone: this._formatPhoneNumber(formData.get('phone')),
         address: formData.get('address'),
         city: formData.get('city'),
         postalCode: formData.get('postalCode'),
@@ -502,6 +529,15 @@ const EditProfile = {
         longitude: parseFloat(longitude),
         profileImage: document.getElementById('profileImageUrl').value
       };
+
+      const phoneNumber = formData.get('phone');
+      if (phoneNumber) {
+        const cleanNumber = phoneNumber.replace(/\D/g, '');
+        if (cleanNumber.length < 10 || cleanNumber.length > 13) {
+          this._showFieldError('phone', 'Nomor telepon tidak valid (10-13 digit)');
+          return;
+        }
+      }
 
       const profileResponse = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
         method: 'PATCH',
