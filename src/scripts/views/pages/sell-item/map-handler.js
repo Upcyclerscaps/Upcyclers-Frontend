@@ -70,9 +70,6 @@ const MapHandler = {
   _updateCoordinatesInput(lat, lng) {
     document.getElementById('latitude').value = lat;
     document.getElementById('longitude').value = lng;
-
-    // Debug log
-    console.log('Coordinates updated:', { lat, lng });
   },
 
   async _getAddress(lat, lng) {

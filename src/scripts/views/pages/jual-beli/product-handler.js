@@ -11,7 +11,6 @@ const ProductHandler = {
     try {
       // Get products and ensure it's an array
       const products = this.dataHandler.getProducts() || [];
-      console.log('Rendering products:', products); // Debug
 
       if (!this.productsContainer) {
         console.error('Products container not found');

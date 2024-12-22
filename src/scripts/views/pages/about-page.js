@@ -2,6 +2,7 @@
 const About = {
   async render() {
     return `
+      <div class="pt-16">
         <!-- Header Section -->
         <div class="relative bg-primary-800 text-white py-16">
           <div class="container mx-auto px-4">
@@ -127,6 +128,7 @@ const About = {
           </div>
         </div>
       </section>
+    </div>
     `;
   },
 

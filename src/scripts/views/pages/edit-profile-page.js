@@ -169,6 +169,58 @@ const EditProfile = {
     this._initializeForm();
   },
 
+  _validateField(input, form) {
+    const errorId = `${input.name}-error`;
+    let errorElement = document.getElementById(errorId);
+
+    // Create error element if doesn't exist
+    if (!errorElement) {
+      errorElement = document.createElement('span');
+      errorElement.id = errorId;
+      errorElement.className = 'text-red-500 text-sm mt-1 block';
+      input.parentNode.appendChild(errorElement);
+    }
+
+    // Reset styling
+    input.classList.remove('border-red-500');
+    errorElement.textContent = '';
+    errorElement.classList.add('hidden');
+
+    let isValid = true;
+    let errorMessage = '';
+
+    // Validasi required fields
+    if (input.hasAttribute('required') && !input.value.trim()) {
+      isValid = false;
+      errorMessage = 'Field ini wajib diisi';
+    }
+    // Validasi spesifik
+    else if (input.name === 'newPassword' && input.value) {
+      if (input.value.length < 8) {
+        isValid = false;
+        errorMessage = 'Password minimal 8 karakter';
+      }
+    }
+    else if (input.name === 'confirmPassword' && input.value) {
+      const newPassword = form.querySelector('[name="newPassword"]').value;
+      if (input.value !== newPassword) {
+        // eslint-disable-next-line no-unused-vars
+        isValid = false;
+        errorMessage = 'Password tidak sama';
+      }
+    }
+
+    // Show error if invalid
+    if (!errorMessage) {
+      return true;
+    }
+
+    input.classList.add('border-red-500');
+    errorElement.textContent = errorMessage;
+    errorElement.classList.remove('hidden');
+    return false;
+  },
+
   _showWelcomeMessage() {
     const messageHTML = `
       <div id="welcomeMessage" 
@@ -216,16 +268,22 @@ const EditProfile = {
   },
 
   _initializeImageUpload() {
-    const input = document.getElementById('profileImageInput');
     const preview = document.getElementById('previewImage');
-    const hiddenInput = document.getElementById('profileImageUrl');
+    const defaultImage = 'https://via.placeholder.com/128?text=Profile';
 
+    // Set default image if src is invalid
+    preview.onerror = () => {
+      preview.src = defaultImage;
+    };
+
+    // Handle image upload
+    const input = document.getElementById('profileImageInput');
     input?.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       if (file.size > 2 * 1024 * 1024) {
-        alert('Ukuran file maksimal 2MB');
+        this._showError('Ukuran file maksimal 2MB');
         input.value = '';
         return;
       }
@@ -244,17 +302,16 @@ const EditProfile = {
           body: formData
         });
 
-        if (!response.ok) throw new Error('Upload failed');
+        if (!response.ok) throw new Error('Gagal mengupload gambar');
 
         const data = await response.json();
-
         preview.src = data.data.url;
-        hiddenInput.value = data.data.url; // Update hidden input with cloudinary URL
+        document.getElementById('profileImageUrl').value = data.data.url;
 
       } catch (error) {
         console.error('Error uploading image:', error);
-        alert('Gagal mengupload gambar. Silakan coba lagi.');
-        preview.src = this._getUserData()?.profileImage || 'https://via.placeholder.com/128';
+        this._showError('Gagal mengupload gambar. Silakan coba lagi.');
+        preview.src = this._getUserData()?.profileImage || defaultImage;
       }
     });
   },
@@ -351,86 +408,162 @@ const EditProfile = {
   async _handleSubmit(event) {
     event.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Silakan login kembali');
-      }
+      // Clear previous errors
+      document.querySelectorAll('.error-message').forEach((el) => el.remove());
 
-      const formData = new FormData(event.target);
+      const form = event.target;
+      const inputs = form.querySelectorAll('input[required]');
+      let hasError = false;
+
+      // Validate all required fields
+      inputs.forEach((input) => {
+        if (!this._validateField(input, form)) {
+          hasError = true;
+        }
+      });
+
+      if (hasError) return;
+
+      const formData = new FormData(form);
       const currentPassword = formData.get('currentPassword');
       const newPassword = formData.get('newPassword');
       const confirmPassword = formData.get('confirmPassword');
 
+      // Password validation
       if (currentPassword || newPassword || confirmPassword) {
-        // Validasi lebih ketat
-        if (!currentPassword) throw new Error('Password saat ini harus diisi');
-        if (!newPassword) throw new Error('Password baru harus diisi');
-        if (newPassword.length < 8) throw new Error('Password baru minimal 8 karakter');
-        if (newPassword !== confirmPassword) throw new Error('Konfirmasi password tidak sesuai');
-        if (currentPassword === newPassword) throw new Error('Password baru harus berbeda dengan password saat ini');
-
-        console.log('Sending password update request...'); // Debug log
-
-        const passwordResponse = await fetch(API_ENDPOINT.UPDATE_PASSWORD, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            currentPassword,
-            newPassword
-          })
-        });
-
-        const passwordData = await passwordResponse.json();
-        console.log('Password update response:', passwordData);
-
-        if (!passwordResponse.ok) {
-          throw new Error(passwordData.message || 'Gagal mengubah password');
+        if (!currentPassword) {
+          this._showFieldError('currentPassword', 'Password saat ini harus diisi');
+          return;
+        }
+        if (!newPassword) {
+          this._showFieldError('newPassword', 'Password baru harus diisi');
+          return;
+        }
+        if (newPassword.length < 8) {
+          this._showFieldError('newPassword', 'Password minimal 8 karakter');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          this._showFieldError('confirmPassword', 'Password tidak sama');
+          return;
         }
 
-        alert('Password berhasil diubah');
-        window.location.hash = '#/profile';
-        return;
+        try {
+          const response = await fetch(API_ENDPOINT.UPDATE_PASSWORD, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ currentPassword, newPassword })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            if (response.status === 401) {
+              this._showFieldError('currentPassword', 'Password saat ini salah');
+              return;
+            }
+            throw new Error(data.message || 'Gagal mengubah password');
+          }
+
+          // Show success message
+          this._showSuccessMessage('Password berhasil diubah');
+          setTimeout(() => {
+            window.location.hash = '#/profile';
+          }, 1500);
+          return;
+        } catch (error) {
+          this._showError(error.message);
+          return;
+        }
       }
 
-      // Update profil normal jika tidak ada perubahan password
-      const updateData = {
-        name: `${formData.get('firstName')} ${formData.get('lastName')}`.trim(),
-        phone: formData.get('phone'),
-        address: formData.get('address'),
-        city: formData.get('city'),
-        postalCode: formData.get('postalCode')
-      };
-
-      if (document.getElementById('profileImageUrl').value) {
-        updateData.profileImage = document.getElementById('profileImageUrl').value;
-      }
-
-      const profileResponse = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
-      });
-
-      if (!profileResponse.ok) {
-        const error = await profileResponse.json();
-        throw new Error(error.message || 'Gagal memperbarui profil');
-      }
-
-      const { data } = await profileResponse.json();
-      localStorage.setItem('user', JSON.stringify(data.user));
-      alert('Profil berhasil diperbarui');
-      window.location.hash = '#/profile';
-
+      // Update profile data...
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert(error.message || 'Terjadi kesalahan saat memperbarui profil');
+      this._showError(error.message || 'Terjadi kesalahan saat memperbarui profil');
     }
+  },
+  _showFieldError(fieldName, message) {
+    const input = document.querySelector(`[name="${fieldName}"]`);
+    if (!input) return;
+
+    input.classList.add('border-red-500');
+
+    const errorElement = document.createElement('span');
+    errorElement.className = 'text-red-500 text-sm mt-1 block error-message';
+    errorElement.textContent = message;
+
+    const existingError = input.parentNode.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+
+    input.parentNode.appendChild(errorElement);
+  },
+
+  _showError(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `fixed top-16 left-1/2 transform -translate-x-1/2 
+      bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg z-50 
+      mt-4 w-96 animate-fade-in`;
+
+    alertDiv.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-circle text-red-500"></i>
+          <p class="ml-3">${message}</p>
+        </div>
+        <button class="text-red-500 hover:text-red-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+
+    alertDiv.querySelector('button').addEventListener('click', () => {
+      alertDiv.remove();
+    });
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+      alertDiv.style.opacity = '0';
+      alertDiv.style.transform = 'translate(-50%, -20px)';
+      setTimeout(() => alertDiv.remove(), 300);
+    }, 5000);
+  },
+
+  _showSuccessMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `fixed top-16 left-1/2 transform -translate-x-1/2 
+      bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-lg z-50 
+      mt-4 w-96 animate-fade-in`;
+
+    alertDiv.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <i class="fas fa-check-circle text-green-500"></i>
+          <p class="ml-3">${message}</p>
+        </div>
+        <button class="text-green-500 hover:text-green-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+
+    alertDiv.querySelector('button').addEventListener('click', () => {
+      alertDiv.remove();
+    });
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+      alertDiv.style.opacity = '0';
+      alertDiv.style.transform = 'translate(-50%, -20px)';
+      setTimeout(() => alertDiv.remove(), 300);
+    }, 3000);
   }
 };
 

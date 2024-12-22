@@ -168,8 +168,6 @@ const EditBuyItemPage = {
         }
       };
 
-      console.log('Sending update data:', updateData); // Debug log
-
       const response = await fetch(`${API_ENDPOINT.BUY_OFFER_DETAIL(offerId)}`, {
         method: 'PATCH',
         headers: {

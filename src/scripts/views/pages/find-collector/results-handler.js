@@ -7,9 +7,6 @@ const ResultsHandler = {
   displayResults(results) {
     const container = document.getElementById('searchResults');
 
-    // Debug log
-    console.log('Displaying results:', results);
-
     // Validasi results
     if (!results || (typeof results !== 'object')) {
       console.log('No valid results object');
@@ -20,10 +17,7 @@ const ResultsHandler = {
     const sellers = Array.isArray(results.sellers) ? results.sellers : [];
     const buyers = Array.isArray(results.buyers) ? results.buyers : [];
 
-    console.log('Processed results:', { sellers, buyers });
-
     if (sellers.length === 0 && buyers.length === 0) {
-      console.log('No sellers or buyers found');
       container.innerHTML = this._createEmptyResultTemplate();
       return;
     }
@@ -32,18 +26,13 @@ const ResultsHandler = {
 
     // Render sellers section if exists
     if (sellers.length > 0) {
-      console.log('Rendering sellers:', sellers.length);
       html += this._createResultsSection('Barang yang Dijual di Sekitar', sellers, 'seller');
     }
 
     // Render buyers section if exists
     if (buyers.length > 0) {
-      console.log('Rendering buyers:', buyers.length);
       html += this._createResultsSection('Penawaran Beli di Sekitar', buyers, 'buyer');
     }
-
-    // Update container
-    console.log('Final HTML:', html.length > 0);
     container.innerHTML = html || this._createEmptyResultTemplate();
   },
 

@@ -61,8 +61,6 @@ const TemplateCreator = {
   },
 
   createProductCard(product) {
-    console.log('Full product data:', product); // debugging
-
     return `
         <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer"
             onclick="window.location.hash = '#/product/${product._id}'">
@@ -101,11 +99,8 @@ const TemplateCreator = {
   },
 
   _getProductImage(product) {
-    console.log('Product images:', product.images);
-
     if (product.images && Array.isArray(product.images) && product.images.length > 0) {
       const mainImage = product.images.find((img) => img.is_primary) || product.images[0];
-      console.log('Selected image:', mainImage);
       return mainImage.url;
     }
 
@@ -113,8 +108,6 @@ const TemplateCreator = {
   },
 
   _formatQuantity(product) {
-    console.log('Stock data:', product.stock); // debugging
-
     // Perbaikan pengecekan stok
     if (product.stock && typeof product.stock.amount === 'number' && product.stock.unit) {
       return `${product.stock.amount.toLocaleString()} ${product.stock.unit} tersedia`;
@@ -135,9 +128,6 @@ const TemplateCreator = {
   },
 
   _formatPrice(product) {
-    console.log('Price data:', product.price); // debugging
-    console.log('Stock data for unit:', product.stock); // debugging
-
     // Perbaikan format harga
     if (product.price && typeof product.price.amount === 'number') {
       const price = `Rp ${product.price.amount.toLocaleString()}`;

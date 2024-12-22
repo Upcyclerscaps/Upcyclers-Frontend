@@ -236,8 +236,6 @@ const BuyItemPage = {
         }
       };
 
-      console.log('Sending buy offer data:', buyerData); // Debug log
-
       const response = await fetch(API_ENDPOINT.BUY_OFFERS, {
         method: 'POST',
         headers: {

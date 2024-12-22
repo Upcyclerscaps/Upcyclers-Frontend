@@ -93,9 +93,6 @@ const AdminDashboard = {
 
       const { data } = await response.json();
 
-      // Log the data to check its structure
-      console.log('Dashboard Data:', data);
-
       // Update stats
       this._updateStats(data.stats);
 

@@ -133,7 +133,6 @@ const SearchHandler = {
 
       // Get search results
       const response = await this._fetchResults(searchType, formData);
-      console.log('Raw response:', response);
 
       // Format results properly
       const displayData = {
@@ -144,8 +143,6 @@ const SearchHandler = {
           parseFloat(formData.location.split(',')[0])
         ]
       };
-
-      console.log('Formatted display data:', displayData);
 
       // Update UI dan map
       this.resultsHandler.displayResults(displayData);
@@ -193,8 +190,6 @@ const SearchHandler = {
       const endpoint = searchType === 'seller' ? API_ENDPOINT.GET_PRODUCTS : API_ENDPOINT.BUY_OFFERS;
       const url = `${endpoint}?${params}`;
 
-      console.log('Fetching from:', url);
-
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -203,7 +198,6 @@ const SearchHandler = {
       });
 
       const data = await response.json();
-      console.log('Response data:', data);
 
       return data; // Return langsung response dari server
     } catch (error) {

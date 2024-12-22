@@ -10,7 +10,6 @@ const DataHandler = {
     try {
       const response = await ProductService.getAllProducts();
       this._products = Array.isArray(response.data) ? response.data : [];
-      console.log('Fetched products:', this._products); // Debug
       return this._products;
     } catch (error) {
       console.error('Error fetching products:', error);

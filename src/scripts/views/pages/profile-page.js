@@ -17,7 +17,7 @@ const Profile = {
     if (!user) return '';
 
     return `
-      <div class="container mx-auto px-4 pt-24">
+      <div class="container mx-auto px-4 pt-24 pb-24">
         <div class="max-w-4xl mx-auto">
           <!-- Profile Header -->
           <div class="bg-white rounded-lg shadow-md p-6 mb-6">

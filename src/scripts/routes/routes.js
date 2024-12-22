@@ -7,6 +7,7 @@ const routes = {
   '/sell-item': () => import('../views/pages/sell-item'),
   '/buy-item': () => import('../views/pages/buy-item'),
   '/jual-beli': () => import('../views/pages/jual-beli'),
+  '/product/:id': () => import('../views/pages/detail-product-page'),
   '/find-collector': () => import('../views/pages/find-collector'),
   '/about': () => import('../views/pages/about-page'),
   '/404': () => import('../views/pages/not-found'),

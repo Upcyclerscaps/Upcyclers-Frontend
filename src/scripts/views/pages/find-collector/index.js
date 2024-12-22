@@ -9,7 +9,7 @@ const FindCollectorPage = {
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <section class="pt-24 pb-12">
         <div class="container mx-auto px-4">
-          <h1 class="text-3xl font-bold mb-8">Temukan Pengepul/Pembeli di Sekitar Anda</h1>
+          <h1 class="text-3xl font-bold mb-8">Temukan Pengepul/Penjual di Sekitar Anda</h1>
           ${this._createSearchTypeSection()}
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             ${this._createFilterSection()}
