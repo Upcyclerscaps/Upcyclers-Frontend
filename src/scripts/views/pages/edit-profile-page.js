@@ -412,24 +412,42 @@ const EditProfile = {
       document.querySelectorAll('.error-message').forEach((el) => el.remove());
 
       const form = event.target;
-      const inputs = form.querySelectorAll('input[required]');
-      let hasError = false;
+      const formData = new FormData(form);
 
-      // Validate all required fields
-      inputs.forEach((input) => {
-        if (!this._validateField(input, form)) {
+      // Validate required fields (except password fields)
+      const requiredFields = {
+        firstName: 'Nama depan',
+        lastName: 'Nama belakang',
+        phone: 'Nomor telepon',
+        address: 'Alamat lengkap',
+        city: 'Kota',
+        postalCode: 'Kode pos'
+      };
+
+      let hasError = false;
+      Object.entries(requiredFields).forEach(([fieldName, label]) => {
+        const value = formData.get(fieldName)?.trim();
+        if (!value) {
+          this._showFieldError(fieldName, `${label} harus diisi`);
           hasError = true;
         }
       });
 
+      // Validate location
+      const latitude = document.getElementById('latitude').value;
+      const longitude = document.getElementById('longitude').value;
+      if (!latitude || !longitude) {
+        this._showError('Silakan pilih lokasi pada peta');
+        hasError = true;
+      }
+
       if (hasError) return;
 
-      const formData = new FormData(form);
+      // Handle password update if provided
       const currentPassword = formData.get('currentPassword');
       const newPassword = formData.get('newPassword');
       const confirmPassword = formData.get('confirmPassword');
 
-      // Password validation
       if (currentPassword || newPassword || confirmPassword) {
         if (!currentPassword) {
           this._showFieldError('currentPassword', 'Password saat ini harus diisi');
@@ -448,6 +466,7 @@ const EditProfile = {
           return;
         }
 
+        // Update password
         try {
           const response = await fetch(API_ENDPOINT.UPDATE_PASSWORD, {
             method: 'PATCH',
@@ -459,7 +478,6 @@ const EditProfile = {
           });
 
           const data = await response.json();
-
           if (!response.ok) {
             if (response.status === 401) {
               this._showFieldError('currentPassword', 'Password saat ini salah');
@@ -467,25 +485,53 @@ const EditProfile = {
             }
             throw new Error(data.message || 'Gagal mengubah password');
           }
-
-          // Show success message
-          this._showSuccessMessage('Password berhasil diubah');
-          setTimeout(() => {
-            window.location.hash = '#/profile';
-          }, 1500);
-          return;
         } catch (error) {
-          this._showError(error.message);
+          this._showError(`Gagal mengubah password: ${  error.message}`);
           return;
         }
       }
 
-      // Update profile data...
+      // Update profile data
+      const profileData = {
+        name: `${formData.get('firstName')} ${formData.get('lastName')}`,
+        phone: formData.get('phone'),
+        address: formData.get('address'),
+        city: formData.get('city'),
+        postalCode: formData.get('postalCode'),
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        profileImage: document.getElementById('profileImageUrl').value
+      };
+
+      const profileResponse = await fetch(API_ENDPOINT.UPDATE_PROFILE, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      if (!profileResponse.ok) {
+        throw new Error('Gagal memperbarui profil');
+      }
+
+      // Update local storage with new user data
+      const { data } = await profileResponse.json();
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Show success and redirect
+      this._showSuccessMessage('Profil berhasil diperbarui');
+      setTimeout(() => {
+        window.location.hash = '#/profile';
+      }, 1500);
+
     } catch (error) {
       console.error('Error updating profile:', error);
       this._showError(error.message || 'Terjadi kesalahan saat memperbarui profil');
     }
   },
+
   _showFieldError(fieldName, message) {
     const input = document.querySelector(`[name="${fieldName}"]`);
     if (!input) return;
@@ -506,6 +552,7 @@ const EditProfile = {
 
   _showError(message) {
     const alertDiv = document.createElement('div');
+    // Update className, tambahkan mt-16 untuk memberikan margin dari header
     alertDiv.className = `fixed top-16 left-1/2 transform -translate-x-1/2 
       bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg z-50 
       mt-4 w-96 animate-fade-in`;
@@ -522,12 +569,14 @@ const EditProfile = {
       </div>
     `;
 
+    // Tambahkan handler untuk tombol close
     alertDiv.querySelector('button').addEventListener('click', () => {
       alertDiv.remove();
     });
 
     document.body.appendChild(alertDiv);
 
+    // Auto remove dengan animasi
     setTimeout(() => {
       alertDiv.style.opacity = '0';
       alertDiv.style.transform = 'translate(-50%, -20px)';
@@ -537,6 +586,7 @@ const EditProfile = {
 
   _showSuccessMessage(message) {
     const alertDiv = document.createElement('div');
+    // Update className dengan style yang sama
     alertDiv.className = `fixed top-16 left-1/2 transform -translate-x-1/2 
       bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-lg z-50 
       mt-4 w-96 animate-fade-in`;
@@ -553,12 +603,14 @@ const EditProfile = {
       </div>
     `;
 
+    // Tambahkan handler untuk tombol close
     alertDiv.querySelector('button').addEventListener('click', () => {
       alertDiv.remove();
     });
 
     document.body.appendChild(alertDiv);
 
+    // Auto remove dengan animasi
     setTimeout(() => {
       alertDiv.style.opacity = '0';
       alertDiv.style.transform = 'translate(-50%, -20px)';
